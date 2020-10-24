@@ -14,7 +14,6 @@ public class MigratedDevice {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private long id;    
-    
     @ManyToOne
     private TypeDevice type_device;
     @ManyToOne

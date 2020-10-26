@@ -41,10 +41,12 @@ body{
 	position: absolute;
 	bottom: -8px;
 	display: none;
+        
 }
 
 .navegacion nav > ul > li:hover span{
 	display: block;
+        
 }
 
 .navegacion nav ul li .submenu{

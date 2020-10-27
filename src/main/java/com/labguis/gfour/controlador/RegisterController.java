@@ -6,7 +6,7 @@
 package com.labguis.gfour.controlador;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
-import com.labguis.gfour.modelo.Usuario;
+import com.labguis.gfour.modelo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,8 +25,8 @@ public class RegisterController {
     private IUsuarioService service;
     
     @PostMapping("/register")
-    public String register(@Validated Usuario user, @RequestParam("password_2") String pass2, Model model) {
-        if(!checkName(user.getNombre())) {
+    public String register(@Validated User user, @RequestParam("password_2") String pass2, Model model) {
+        if(!checkName(user.getName())) {
             model.addAttribute("error", "Longitud del nombre incorrecta");
         }
         else if(!checkPass(user.getPassword())) {
@@ -44,7 +44,7 @@ public class RegisterController {
     
     @GetMapping("/register")
     public String register(Model model) {
-        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("usuario", new User());
         return "registro";
     }
     

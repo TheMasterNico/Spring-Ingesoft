@@ -5,7 +5,7 @@
  */
 package com.labguis.gfour.interfaceService;
 
-import com.labguis.gfour.modelo.Usuario;
+import com.labguis.gfour.modelo.User;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,9 +14,9 @@ import java.util.Optional;
  * DAO
  */
 public interface IUsuarioService {
-    public List<Usuario>listar();
-    public Optional<Usuario>listarId(int id);
-    public int save(Usuario u);
+    public List<User>listar();
+    public Optional<User>listarId(int id);
+    public int save(User u);
     public void delete(int id);
-    Usuario findByNombre(String nombre);
+    User findByName(String nombre);
 }

@@ -10,8 +10,10 @@ import javax.persistence.*;
 @Table(name="locations")
 public class Location {
     @Id
-    @Column(unique = true)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private long id;
+    @Column(unique = true)
+    private String number_id;
     private String name;
     
     @ManyToOne
@@ -20,6 +22,13 @@ public class Location {
     public Location() {
     }
 
+    public String getNumber_id() {
+        return number_id;
+    }
+
+    public void setNumber_id(String number_id) {
+        this.number_id = number_id;
+    }
        
     public long getId() {
         return id;

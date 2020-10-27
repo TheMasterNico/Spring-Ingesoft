@@ -5,7 +5,7 @@
  */
 package com.labguis.gfour.interfaces;
 
-import com.labguis.gfour.modelo.Usuario;
+import com.labguis.gfour.modelo.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author Makot
  */
 @Repository
-public interface IUsuario extends CrudRepository<Usuario, Integer> {    
-    Usuario findByNombre(String nombre);
+public interface IUsuario extends CrudRepository<User, Integer> {    
+    User findByName(String nombre);
 }

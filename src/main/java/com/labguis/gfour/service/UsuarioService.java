@@ -7,7 +7,7 @@ package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
 import com.labguis.gfour.interfaces.IUsuario;
-import com.labguis.gfour.modelo.Usuario;
+import com.labguis.gfour.modelo.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +24,19 @@ public class UsuarioService implements IUsuarioService {
     private IUsuario data;
     
     @Override
-    public List<Usuario> listar() {
-        return (List<Usuario>)data.findAll();
+    public List<User> listar() {
+        return (List<User>)data.findAll();
     }
 
     @Override
-    public Optional<Usuario> listarId(int id) {
+    public Optional<User> listarId(int id) {
         return data.findById(id);
     }
 
     @Override
-    public int save(Usuario u) {
+    public int save(User u) {
         int res = 0;
-        Usuario usuario = data.save(u);
+        User usuario = data.save(u);
         if(!usuario.equals(null)) res = 1;
         return res;
     }
@@ -47,8 +47,8 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
-    public Usuario findByNombre(String nombre) {
-        return data.findByNombre(nombre);
+    public User findByName(String nombre) {
+        return data.findByName(nombre);
     }
     
 }

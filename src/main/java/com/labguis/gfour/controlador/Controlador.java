@@ -1,7 +1,7 @@
 package com.labguis.gfour.controlador;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
-import com.labguis.gfour.modelo.Usuario;
+import com.labguis.gfour.modelo.User;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,7 @@ public class Controlador {
     
     @GetMapping("/listar")
     public String listar(Model model) {
-        List<Usuario>usuarios =  service.listar();
+        List<User>usuarios =  service.listar();
         model.addAttribute("usuarios", usuarios);
         return "index";
     }
@@ -37,12 +37,12 @@ public class Controlador {
 
     @GetMapping("/new")
     public String nuevo(Model model) {
-        model.addAttribute("persona", new Usuario());
+        model.addAttribute("persona", new User());
         return "form";
     }
 
     @PostMapping("/save")
-    public String save(@Validated Usuario p,Model model) {
+    public String save(@Validated User p,Model model) {
             int id=service.save(p);
             if(id==0) {
                     return "form";

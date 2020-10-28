@@ -36,6 +36,11 @@ public class DeviceService implements IDeviceService {
     public void delete(int id) {
         data.deleteById(id);
     }
+
+    @Override
+    public MigratedDevice findByInvPlate(String inv_plate) {
+        return data.findByInvPlate(inv_plate);
+    }
     
     
 }

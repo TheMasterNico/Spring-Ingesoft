@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IDevice extends CrudRepository<MigratedDevice, Integer> {
-    
+    MigratedDevice findByInvPlate(String inv_plate);
 }

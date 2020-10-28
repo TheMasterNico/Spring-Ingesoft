@@ -10,4 +10,5 @@ public interface IDeviceService {
     public Optional<MigratedDevice>listarId(int id);
     public int save(MigratedDevice u);
     public void delete(int id);
+    MigratedDevice findByInvPlate(String inv_plate);
 }

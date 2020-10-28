@@ -3,11 +3,14 @@ package com.labguis.gfour.controlador;
 import com.labguis.gfour.interfaceService.IAgencieService;
 import com.labguis.gfour.interfaceService.IDeviceService;
 import com.labguis.gfour.interfaceService.ILocationService;
+import com.labguis.gfour.interfaceService.ITypeDeviceService;
 import com.labguis.gfour.interfaceService.IUsuarioService;
 import com.labguis.gfour.modelo.Agencie;
 import com.labguis.gfour.modelo.Location;
 import com.labguis.gfour.modelo.MigratedDevice;
+import com.labguis.gfour.modelo.TypeDevice;
 import com.labguis.gfour.modelo.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +34,8 @@ public class DeviceController {
     private ILocationService ils;
     @Autowired
     private IUsuarioService ius;
+    @Autowired
+    private ITypeDeviceService itds;
     
     @GetMapping("/equipos")
     public String equipos(Model model) {
@@ -188,14 +193,33 @@ public class DeviceController {
                 ils.save(location);
             }
         }
-//        MigratedDevice m = new MigratedDevice();
-//        m.setAgencie(ias.findByName(names[0]));
-//        m.setClass_room(211);
-//        m.setDescription("Descripcion cortita");
-//        m.setInv_plate("115599");
-//        m.setLocation(2);
-//        
-//        ids.save(m);
+        if(itds.findByName("Computador de mesa") == null) {
+            TypeDevice type = new TypeDevice();
+            type.setName("Computador de mesa");
+            type.setDescription("Computador sobre escritorio con pantalla, teclado, mouse y torre");
+            type.setUser(ius.findByName("Servidor"));
+            itds.save(type);
+        }
+        if(ids.findByInvPlate("115599") == null) {
+            MigratedDevice m = new MigratedDevice();
+            m.setAgencie(ias.findByName(names[0]));
+            m.setClassRoom(211);
+            m.setDescription("Descripcion cortita");
+            m.setInvPlate("115599");
+            m.setLocation(ils.findByName("Unibiblos"));
+            m.setMAC("C2:Ms:d4");
+            m.setNewIP("10.159.156.12");
+            m.setOldIP("192.168.1.6");
+            m.setOwnerUser(ius.findByName("Servidor"));
+            m.setPort("1594862");
+            m.setRegisterTime(LocalDateTime.now());
+            m.setStandarKey("BBxx015dh2ed45thr5");
+            m.setSwitchIP("184.255.23.24");
+            m.setTypeDevice(itds.findByName("Computador de mesa"));
+            m.setUpdateUser(ius.findByName("Servidor"));
+            m.setUser(ius.findByName("Servidor"));        
+            ids.save(m);
+        }        
         System.out.println("Se ingresaron los datos");
         return "index";
     }

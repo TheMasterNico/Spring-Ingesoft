@@ -1,6 +1,6 @@
 package com.labguis.gfour.modelo;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 
 /**
@@ -15,28 +15,28 @@ public class MigratedDevice {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private long id;    
     @ManyToOne
-    private TypeDevice type_device;
+    private TypeDevice typeDevice;
     @ManyToOne
     private Location location;
     @ManyToOne
     private User user;
     @ManyToOne
-    private User update_user;
+    private User updateUser;
     @ManyToOne
-    private User owner_user;
+    private User ownerUser;
     @ManyToOne
     private Agencie agencie;
     
     @Column(nullable = false, unique = true)
-    private String standar_key;
+    private String standarKey;
     @Column(nullable = false, unique = true)
-    private String inv_plate;
-    private String switch_ip;
-    private String new_ip;
-    private String old_ip;
-    private int class_room;
+    private String invPlate;
+    private String switchIP;
+    private String newIP;
+    private String oldIP;
+    private int classRoom;
     
-    private Date register_time;    
+    private LocalDateTime registerTime;    
     @Column(nullable = true)
     private String description;
     @Column(nullable = true)
@@ -55,12 +55,12 @@ public class MigratedDevice {
         this.id = id;
     }
 
-    public TypeDevice getType_device() {
-        return type_device;
+    public TypeDevice getTypeDevice() {
+        return typeDevice;
     }
 
-    public void setType_device(TypeDevice type_device) {
-        this.type_device = type_device;
+    public void setTypeDevice(TypeDevice typeDevice) {
+        this.typeDevice = typeDevice;
     }
 
     public Location getLocation() {
@@ -79,20 +79,20 @@ public class MigratedDevice {
         this.user = user;
     }
 
-    public User getUpdate_user() {
-        return update_user;
+    public User getUpdateUser() {
+        return updateUser;
     }
 
-    public void setUpdate_user(User update_user) {
-        this.update_user = update_user;
+    public void setUpdateUser(User updateUser) {
+        this.updateUser = updateUser;
     }
 
-    public User getOwner_user() {
-        return owner_user;
+    public User getOwnerUser() {
+        return ownerUser;
     }
 
-    public void setOwner_user(User owner_user) {
-        this.owner_user = owner_user;
+    public void setOwnerUser(User ownerUser) {
+        this.ownerUser = ownerUser;
     }
 
     public Agencie getAgencie() {
@@ -103,60 +103,60 @@ public class MigratedDevice {
         this.agencie = agencie;
     }
 
-    public String getStandar_key() {
-        return standar_key;
+    public String getStandarKey() {
+        return standarKey;
     }
 
-    public void setStandar_key(String standar_key) {
-        this.standar_key = standar_key;
+    public void setStandarKey(String standarKey) {
+        this.standarKey = standarKey;
     }
 
-    public String getInv_plate() {
-        return inv_plate;
+    public String getInvPlate() {
+        return invPlate;
     }
 
-    public void setInv_plate(String inv_plate) {
-        this.inv_plate = inv_plate;
+    public void setInvPlate(String invPlate) {
+        this.invPlate = invPlate;
     }
 
-    public String getSwitch_ip() {
-        return switch_ip;
+    public String getSwitchIP() {
+        return switchIP;
     }
 
-    public void setSwitch_ip(String switch_ip) {
-        this.switch_ip = switch_ip;
+    public void setSwitchIP(String switchIP) {
+        this.switchIP = switchIP;
     }
 
-    public String getNew_ip() {
-        return new_ip;
+    public String getNewIP() {
+        return newIP;
     }
 
-    public void setNew_ip(String new_ip) {
-        this.new_ip = new_ip;
+    public void setNewIP(String newIP) {
+        this.newIP = newIP;
     }
 
-    public String getOld_ip() {
-        return old_ip;
+    public String getOldIP() {
+        return oldIP;
     }
 
-    public void setOld_ip(String old_ip) {
-        this.old_ip = old_ip;
+    public void setOldIP(String oldIP) {
+        this.oldIP = oldIP;
     }
 
-    public int getClass_room() {
-        return class_room;
+    public int getClassRoom() {
+        return classRoom;
     }
 
-    public void setClass_room(int class_room) {
-        this.class_room = class_room;
+    public void setClassRoom(int classRoom) {
+        this.classRoom = classRoom;
     }
 
-    public Date getRegister_time() {
-        return register_time;
+    public LocalDateTime getRegisterTime() {
+        return registerTime;
     }
 
-    public void setRegister_time(Date register_time) {
-        this.register_time = register_time;
+    public void setRegisterTime(LocalDateTime registerTime) {
+        this.registerTime = registerTime;
     }
 
     public String getDescription() {
@@ -182,6 +182,7 @@ public class MigratedDevice {
     public void setPort(String port) {
         this.port = port;
     }
+
     
     
 }

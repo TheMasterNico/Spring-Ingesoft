@@ -24,7 +24,7 @@ public class RegisterController {
     @Autowired
     private IUsuarioService service;
     
-    @PostMapping("/register")
+    @PostMapping("/registro")
     public String register(@Validated User user, @RequestParam("password_2") String pass2, Model model) {
         if(!checkName(user.getName())) {
             model.addAttribute("error", "Longitud del nombre incorrecta");

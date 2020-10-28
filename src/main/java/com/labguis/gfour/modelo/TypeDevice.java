@@ -5,6 +5,7 @@
  */
 package com.labguis.gfour.modelo;
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 
@@ -14,7 +15,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="type_devices")
-public class TypeDevice {
+public class TypeDevice implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private long id; 

@@ -123,7 +123,6 @@ color: rgba(255, 255, 255, 0.8);
 #boton{
 width: 300px;
 height: 40px;
-margin-top: 30px;
 font-weight: 500;
 background: linear-gradient(180deg, #3969FC 0%, #2A49FF 100%);
 box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);

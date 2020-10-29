@@ -8,8 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.labguis")
 public class GfourApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(GfourApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(GfourApplication.class, args);
+    }
 }

@@ -19,4 +19,5 @@ public interface IUsuarioService {
     public int save(User u);
     public void delete(int id);
     User findByName(String nombre);
+    User findByEmail(String email);
 }

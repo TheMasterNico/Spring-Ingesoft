@@ -1,49 +1,44 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html lang="en-US" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<html xmlns="https://www.thymeleaf.org">
+
     <head>
         <link href="../css/estilos.css" rel="stylesheet" type="text/css"/>
-        <link href='https://fonts.googleapis.com/css?family=Mulish' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Mulish' rel='stylesheet'/>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- CSS only -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            <!-- CSS only -->
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"/>
     </head  >
     <body>
-
         <div id ="imgunal"></div>
         <div id ="imggente"></div>
         <p id ="saludo">Acá podrás llevar de manera fácil y sencilla la migración a 802.1x</p>
         <div id = "cuadrologin">
-            
+
             <div id="cuadrolog">
-            <form th:action="@{/login}" th:object="${usuario}" method="POST">
-                <p id ="titulo"> Bienvenido de vuelta</p>
-                <hr>
-                <br/><br/>     
-                <label id ="subtitulo"for="nombre">Nombre</label> 
-                <br/><br/>
-                <input id="nombre" name="nombre" type="text"  STYLE="color:#FFFFFF" placeholder="Ingresa tu Email" class="entrada "required=""/>
-                <br/><br/>
-               
-                <label id ="subtitulo" for="password">Contraseña</label>
-                <br/><br/>
-                <input  id="password" name="password" type="password" STYLE="color:#FFFFFF" placeholder="Ingresa tu contraseña" class="entrada"required=""/>
-                
-                    <br/><br/>
-                <input type ="submit" value= "Iniciar sesión" id="boton"/>
- 
-            </form> 
+                <form th:action="@{/login}" th:object="${usuario}" method="POST">
+                    <p id ="titulo"> Bienvenido de vuelta</p>
+                    <hr>
+                        <br/><br/>     
+                        <label id ="subtitulo"for="email">Email</label> 
+                        <br/><br/>
+                        <input id="nombre" name="email" type="text"  STYLE="color:#FFFFFF" placeholder="Ingresa tu Email" class="entrada "required=""/>
+                        <br/><br/>
+
+                        <label id ="subtitulo" for="password">Contraseña</label>
+                        <br/><br/>
+                        <input  id="password" name="password" type="password" STYLE="color:#FFFFFF" placeholder="Ingresa tu contraseña" class="entrada"required=""/>
+
+                        <br/><br/>
+                        <input type ="submit" value= "Iniciar sesión" id="boton"/>
+
+                </form> 
             </div>
-            <a id ="registrolink" href="registro.html" >¿Todavía no tienes una cuenta? Crea una ahora</p>
-            <a id ="olvidocont"href="#">¿Has olvidado tu contraseña?</p>
+            <div class="alert alert-warning m-2" role="alert" th:text="${error}" th:unless="${error == null}"></div>
+            <div class="alert alert-primary m-2" role="alert" th:text="${param.status}" th:unless="${param.status == null}"></div>
+            <div class="alert alert-success m-2" role="alert" th:text="${info}" th:unless="${info == null}"></div>
+            <a id ="registrolink" href="registro.html" >¿Todavía no tienes una cuenta? Crea una ahora</a>
         </div>
-        
+
     </body>
 </html>

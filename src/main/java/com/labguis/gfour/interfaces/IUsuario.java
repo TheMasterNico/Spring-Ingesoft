@@ -16,4 +16,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IUsuario extends CrudRepository<User, Integer> {    
     User findByName(String nombre);
+    User findByEmail(String email);
 }

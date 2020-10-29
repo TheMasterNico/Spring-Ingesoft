@@ -50,5 +50,10 @@ public class UsuarioService implements IUsuarioService {
     public User findByName(String nombre) {
         return data.findByName(nombre);
     }
+
+    @Override
+    public User findByEmail(String email) {
+        return data.findByEmail(email);
+    }
     
 }

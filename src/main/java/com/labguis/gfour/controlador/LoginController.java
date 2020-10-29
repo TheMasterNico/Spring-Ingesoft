@@ -25,36 +25,31 @@ public class LoginController {
     
     @PostMapping("/login")
     public String login(@Validated User user, Model model) {
-        if(!checkName(user.getName())) {
-            model.addAttribute("error", "Longitud del nombre incorrecta");
-        }
-        else if(!checkPass(user.getPassword())) {
-            model.addAttribute("error", "Longitud de la contraseña incorrecta");
-        }
-        else {
-            User user_to_check = service.findByName(user.getName());
-            if(user_to_check == null) model.addAttribute("error", "No se encontro el usuario");
-            else {
-                if(user_to_check.getPassword().equals(user.getPassword())) {
-                    model.addAttribute("info", "Datos correctos. Bienvenido!");
-                }
-                else model.addAttribute("error", "Datos incorrectos");
-            }
-        }
+        int can_login = checkLogin(user);
+        switch (can_login) {
+            case 1:
+                model.addAttribute("error", "No se encontro el usuario");
+                break;
+            case 2:
+                model.addAttribute("error", "Datos incorrectos");
+                break;
+            default:
+                //model.addAttribute("info", "Datos correctos. Bienvenido!");
+                return "redirect:/equipos";
+        }        
         return "login";
+    }
+    
+    public int checkLogin(User user) {
+        User user_to_check = service.findByEmail(user.getEmail());
+        if(user_to_check == null) return 1;
+        if(!user_to_check.getPassword().equals(user.getPassword())) return 2;
+        return 0; // Al ok
     }
     
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("usuario", new User());
         return "login";
-    }
-    
-    public boolean checkName(String nombre) {
-        return (nombre.length() > 1 && nombre.length() <= 8);
-    }
-    
-    public boolean checkPass(String pass) {
-        return (pass.length() > 3 && pass.length() < 6);
     }
 }

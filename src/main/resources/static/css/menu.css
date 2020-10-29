@@ -4,7 +4,7 @@
 }
 
 body{
-	background: url(../imagenes/ingenieria.jpg);
+	background: url('../../image/ingenieria.jpg');
         font-family: 'Mulish';
 	font-size: 14px;
 }
@@ -57,6 +57,7 @@ body{
 	-webkit-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.24);
 	-moz-box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.24);
 	box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.24);
+        z-index: 1;
 }
 
 .navegacion nav ul li:hover .submenu{

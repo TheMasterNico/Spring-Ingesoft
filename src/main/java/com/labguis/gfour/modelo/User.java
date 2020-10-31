@@ -7,11 +7,12 @@ import javax.persistence.*;
  * @author Nicolas Castillo
  */
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private long id; 
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
     @Column(unique = true)
     private String email;
     private String name;
@@ -20,11 +21,11 @@ public class User {
     public User() {
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -51,6 +52,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    
 }

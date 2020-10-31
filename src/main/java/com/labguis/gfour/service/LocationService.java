@@ -1,7 +1,7 @@
 package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.ILocationService;
-import com.labguis.gfour.interfaces.ILocation;
+import com.labguis.gfour.repository.ILocation;
 import com.labguis.gfour.modelo.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

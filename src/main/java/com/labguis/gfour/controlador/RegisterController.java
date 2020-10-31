@@ -7,6 +7,9 @@ package com.labguis.gfour.controlador;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
 import com.labguis.gfour.modelo.User;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +46,7 @@ public class RegisterController {
                 break;
             default:
                 // All ok
+                user.setPassword(service.hashPassword(pass2));
                 int reg = service.save(user); // Save the user in DB      
                 if (reg != 0) {
                     return "redirect:/login?status=Gracias por registrarse";
@@ -69,7 +73,10 @@ public class RegisterController {
     }
 
     @GetMapping("/register")
-    public String register(Model model) {
+    public String register(Model model, HttpServletRequest request) {
+        if(service.isUserLogged(request)) {
+            return "redirect:/equipos";
+        }   
         model.addAttribute("usuario", new User());
         return "registro";
     }

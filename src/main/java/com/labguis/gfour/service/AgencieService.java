@@ -1,7 +1,7 @@
 package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.IAgencieService;
-import com.labguis.gfour.interfaces.IAgencie;
+import com.labguis.gfour.repository.IAgencie;
 import com.labguis.gfour.modelo.Agencie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.labguis.gfour.interfaces;
+package com.labguis.gfour.repository;
 
 import com.labguis.gfour.modelo.MigratedDevice;
 import org.springframework.data.repository.CrudRepository;

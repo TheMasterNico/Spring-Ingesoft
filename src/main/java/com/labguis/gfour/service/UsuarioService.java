@@ -6,12 +6,20 @@
 package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
-import com.labguis.gfour.interfaces.IUsuario;
 import com.labguis.gfour.modelo.User;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.labguis.gfour.repository.UserRepository;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Optional;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.binary.Hex;
 
 /**
  *
@@ -21,23 +29,20 @@ import org.springframework.stereotype.Service;
 public class UsuarioService implements IUsuarioService {
 
     @Autowired
-    private IUsuario data;
-    
+    private UserRepository data;
+
     @Override
     public List<User> listar() {
-        return (List<User>)data.findAll();
+        return (List<User>) data.findAll();
     }
-
-    @Override
-    public Optional<User> listarId(int id) {
-        return data.findById(id);
-    }
-
+    
     @Override
     public int save(User u) {
         int res = 0;
         User usuario = data.save(u);
-        if(!usuario.equals(null)) res = 1;
+        if (!usuario.equals(null)) {
+            res = 1;
+        }
         return res;
     }
 
@@ -56,4 +61,49 @@ public class UsuarioService implements IUsuarioService {
         return data.findByEmail(email);
     }
     
+    
+
+    @Override
+    public String hashPassword(String password) {
+        try {
+            String salt = "IngeSoft";
+            int iterations = 10000;
+            int keyLength = 256;
+            char[] passwordChars = password.toCharArray();
+            byte[] saltBytes = salt.getBytes();
+
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+            PBEKeySpec spec = new PBEKeySpec(passwordChars, saltBytes, iterations, keyLength);
+            SecretKey key = skf.generateSecret(spec);
+            byte[] res = key.getEncoded();
+            return Hex.encodeHexString(res);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isUserLogged(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            String mail = "";
+            int id = 0;
+            for (int i = 0; i < cookies.length; i++) {
+                if("Hash-2".equals(cookies[i].getName())) {
+                    id = Integer.valueOf(cookies[i].getValue());
+                }
+                else if("Hash-1".equals(cookies[i].getName())) {
+                    mail = cookies[i].getValue();
+                }
+            }
+            Optional<User> user = data.findById(id);
+            if(user.get() != null) { // the user exist
+                if(this.hashPassword(user.get().getEmail()).equals(mail)) { // if all cookies are ok
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

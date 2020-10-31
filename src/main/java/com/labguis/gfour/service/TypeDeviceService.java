@@ -1,7 +1,7 @@
 package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.ITypeDeviceService;
-import com.labguis.gfour.interfaces.ITypeDevice;
+import com.labguis.gfour.repository.ITypeDevice;
 import com.labguis.gfour.modelo.TypeDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

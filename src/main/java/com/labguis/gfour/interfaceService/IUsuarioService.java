@@ -8,6 +8,7 @@ package com.labguis.gfour.interfaceService;
 import com.labguis.gfour.modelo.User;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -15,9 +16,10 @@ import java.util.Optional;
  */
 public interface IUsuarioService {
     public List<User>listar();
-    public Optional<User>listarId(int id);
     public int save(User u);
     public void delete(int id);
     User findByName(String nombre);
     User findByEmail(String email);
+    String hashPassword(String password);
+    boolean isUserLogged(HttpServletRequest request);
 }

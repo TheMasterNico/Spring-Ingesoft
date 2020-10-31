@@ -10,13 +10,24 @@ import com.labguis.gfour.modelo.Location;
 import com.labguis.gfour.modelo.MigratedDevice;
 import com.labguis.gfour.modelo.TypeDevice;
 import com.labguis.gfour.modelo.User;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.apache.commons.codec.binary.Hex;
 
 /**
  *
@@ -24,10 +35,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class DeviceController {
-    
+
     @Autowired
-    private IDeviceService ids;    
+    private IDeviceService ids;
     @Autowired
     private IAgencieService ias;
     @Autowired
@@ -36,26 +48,39 @@ public class DeviceController {
     private IUsuarioService ius;
     @Autowired
     private ITypeDeviceService itds;
-    
+
     @GetMapping("/equipos")
-    public String equipos(Model model) {
-        List<MigratedDevice>devices =  ids.listar();
+    public String equipos(Model model, HttpServletRequest request) {        
+        if(!ius.isUserLogged(request)) { // if not logged
+            return "redirect:/login";
+        }        
+        List<MigratedDevice> devices = ids.listar();
         model.addAttribute("datos", devices);
         return "equipos";
     }
-    
+
     @GetMapping("/populate")
     public String populate(Model model) {
-        if(ius.findByName("Servidor") == null) {
+        migration();
+        return "login";
+    }
+
+
+    
+    @EventListener(ApplicationReadyEvent.class)
+    public void migration() {
+        
+        System.err.println("Wait for the start...");
+        if (ius.findByName("Servidor") == null) {
             User u = new User();
             u.setName("Servidor");
             u.setEmail("email@testing.com");
-            u.setPassword("password");
+            u.setPassword(ius.hashPassword("password"));
             ius.save(u);
         }
-        
+
         String[] names = new String[]{
-            "Decanatura", 
+            "Decanatura",
             "Vicedecanatura Académica",
             "Vicedecanatura de Investigación y Extensión",
             "Dirección de Bienestar",
@@ -66,14 +91,14 @@ public class DeviceController {
             "Unidad Administrativa",
             "Programa de Relaciones Internacionales - PRI"
         };
-        if(ias.findByName(names[0]) == null) {
+        if (ias.findByName(names[0]) == null) {
             Agencie agencie;
             for (String name : names) {
                 agencie = new Agencie();
                 agencie.setName(name);
                 ias.save(agencie);
             }
-        }    
+        }
         String[][] lugares = {
             {"101", "Torre de Enfermería"},
             {"102", "Biblioteca Central o Biblioteca Gabriel Garcia Marquez"},
@@ -181,9 +206,9 @@ public class DeviceController {
             {"901", "Portería Vehicular y Peatonal Calle 53"},
             {"905", "Jardín Infantil"},
             {"910", "Instituto Colombiano de Normas Técnicas y Certificación: ICONTEC ( comodato )"},
-            {"933", "CASE CAN Area de salúd (fuera del campus, CAN Calle 44  con carrera 59, por los lados de Gran Estación)."}            
+            {"933", "CASE CAN Area de salúd (fuera del campus, CAN Calle 44  con carrera 59, por los lados de Gran Estación)."}
         };
-        if(ils.findByName(lugares[0][1]) == null) {
+        if (ils.findByName(lugares[0][1]) == null) {
             Location location;
             for (String[] lugare : lugares) {
                 location = new Location();
@@ -193,14 +218,14 @@ public class DeviceController {
                 ils.save(location);
             }
         }
-        if(itds.findByName("Computador de mesa") == null) {
+        if (itds.findByName("Computador de mesa") == null) {
             TypeDevice type = new TypeDevice();
             type.setName("Computador de mesa");
             type.setDescription("Computador sobre escritorio con pantalla, teclado, mouse y torre");
             type.setUser(ius.findByName("Servidor"));
             itds.save(type);
         }
-        if(ids.findByInvPlate("115599") == null) {
+        if (ids.findByInvPlate("115599") == null) {
             MigratedDevice m = new MigratedDevice();
             m.setAgencie(ias.findByName(names[0]));
             m.setClassRoom(211);
@@ -217,11 +242,10 @@ public class DeviceController {
             m.setSwitchIP("184.255.23.24");
             m.setTypeDevice(itds.findByName("Computador de mesa"));
             m.setUpdateUser(ius.findByName("Servidor"));
-            m.setUser(ius.findByName("Servidor"));        
+            m.setUser(ius.findByName("Servidor"));
             ids.save(m);
-        }        
-        System.out.println("Se ingresaron los datos");
-        return "index";
+        }
+        System.out.println("Success Start!");
     }
-    
+
 }

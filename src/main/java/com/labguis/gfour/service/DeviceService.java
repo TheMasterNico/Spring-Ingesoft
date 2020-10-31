@@ -1,7 +1,7 @@
 package com.labguis.gfour.service;
 
 import com.labguis.gfour.interfaceService.IDeviceService;
-import com.labguis.gfour.interfaces.IDevice;
+import com.labguis.gfour.repository.IDevice;
 import com.labguis.gfour.modelo.MigratedDevice;
 import java.util.List;
 import java.util.Optional;

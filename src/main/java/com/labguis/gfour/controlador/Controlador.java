@@ -29,12 +29,7 @@ public class Controlador {
         model.addAttribute("usuarios", usuarios);
         return "index";
     }
-    @GetMapping("/listar/{id}")
-    public String listarId(@PathVariable int id,Model model) {
-        model.addAttribute("persona", service.listarId(id));
-        return "form";
-    }
-
+    
     @GetMapping("/new")
     public String nuevo(Model model) {
         model.addAttribute("persona", new User());

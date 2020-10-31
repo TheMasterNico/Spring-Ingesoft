@@ -16,7 +16,9 @@
         <div class="navegacion">
             <nav>
                 <ul>
-                    <li><a th:href="@{/logout}">Salir<span class="icon icon-up-dir"></span></a></li>
+                    <li><a th:href="@{/logout}">Salir</a></li>
+                    <li><a th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a></li>               
+                    
                 </ul>
             </nav>
         </div>
@@ -47,15 +49,15 @@
                             <tbody>
                                 <tr th:each="device:${datos}">
                                     <td th:text="${device.agencie.name}"></td>
-                                    <td>Computador</td>
-                                    <td>AF:43:DF:56</td>
-                                    <td>345.345.34</td>
-                                    <td>56.56.65</td>
-                                    <td>Yu Takeuchi</td>
-                                    <td>Juan Avila</td>
-                                    <td>45GBs</td>
-                                    <td>45345</td>
-                                    <td>ABCD</td>
+                                    <td th:text="${device.TypeDevice.name}"></td>
+                                    <td th:text="${device.MAC}"></td>
+                                    <td th:text="${device.oldIP}"></td>
+                                    <td th:text="${device.newIP}"></td>
+                                    <td th:text="${device.location.name}"></td>
+                                    <td th:text="${device.user.name}"></td>
+                                    <td th:text="${device.switchIP}"></td>
+                                    <td th:text="${device.port}"></td>
+                                    <td th:text="${device.InvPlate}"></td>
                                     <td>
                                         <a class="btn btn-warning">Editar</a>
 

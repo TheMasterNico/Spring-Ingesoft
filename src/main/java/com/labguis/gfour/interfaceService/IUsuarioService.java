@@ -22,4 +22,6 @@ public interface IUsuarioService {
     User findByEmail(String email);
     String hashPassword(String password);
     boolean isUserLogged(HttpServletRequest request);
+    boolean checkWhiteList(String email);
+    public boolean isUserAdmin(HttpServletRequest request);
 }

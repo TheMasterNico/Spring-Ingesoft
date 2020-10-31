@@ -6,7 +6,10 @@
 package com.labguis.gfour.controlador;
 
 import com.labguis.gfour.interfaceService.IUsuarioService;
+import com.labguis.gfour.interfaceService.InterfaceWhiteList;
 import com.labguis.gfour.modelo.User;
+import com.labguis.gfour.modelo.WhiteList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +29,8 @@ public class RegisterController {
 
     @Autowired
     private IUsuarioService service;
+    @Autowired
+    private InterfaceWhiteList iwls;
 
     @PostMapping("/register")
     public String register(@Validated User user, @RequestParam("password_2") String pass2, Model model) {
@@ -43,6 +49,9 @@ public class RegisterController {
                 break;
             case 4:
                 model.addAttribute("error", "El usuario con correo " + user.getEmail() + " ya existe");
+                break;
+            case 5:
+                model.addAttribute("error", "El correo  " + user.getEmail() + " no esta autorizado");
                 break;
             default:
                 // All ok
@@ -69,16 +78,48 @@ public class RegisterController {
         if (!checkPasswords(pass1, pass2)) {
             return 3;
         }
+        if (!service.checkWhiteList(email)) {
+            return 5;
+        }
         return 0; // All ok
     }
 
     @GetMapping("/register")
     public String register(Model model, HttpServletRequest request) {
-        if(service.isUserLogged(request)) {
+        if (service.isUserLogged(request)) {
             return "redirect:/equipos";
-        }   
+        }
         model.addAttribute("usuario", new User());
         return "registro";
+    }
+
+    @PostMapping("/autorizar")
+    public String autorizar(@Validated WhiteList w, Model model, HttpServletRequest request) {
+        if (!service.isUserAdmin(request)) {
+            return "redirect:/autorizar";
+        }
+        WhiteList wl = iwls.findByEmail(w.getEmail());
+        if(wl == null) {
+            iwls.save(w);
+        }
+        return "redirect:/autorizar";
+    }
+
+    @GetMapping("/autorizar")
+    public String autorizar(Model model, HttpServletRequest request) {
+        if (!service.isUserAdmin(request)) {
+            return "redirect:/equipos";
+        }
+        List<WhiteList> wl = iwls.listar();
+        model.addAttribute("whitelists", wl);
+        model.addAttribute("newwl", new WhiteList());
+        return "autorizar";
+    }
+
+    @GetMapping("/deleteWL/{id}")
+    public String eliminar(@PathVariable int id, Model model) {
+        iwls.delete(id);
+        return "redirect:/listar";
     }
 
     public boolean checkPasswords(String pass1, String pass2) {

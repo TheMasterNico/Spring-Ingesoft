@@ -55,13 +55,7 @@ public class DeviceController {
             return "redirect:/login";
         }        
         List<MigratedDevice> devices = ids.listar();
-        for (int i = 0; i < devices.size(); i++) {
-            MigratedDevice get = devices.get(i);
-            for (MigratedDevice device : devices) {
-                System.err.println(device.getTypeDevice());
-            }
-            
-        }
+        
         model.addAttribute("datos", devices);
         model.addAttribute("isadmin", ius.isUserAdmin(request));
         return "equipos";

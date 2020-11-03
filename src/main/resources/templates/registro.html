@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Migracion Unal</title>
+        <title>Registro Unal</title>
 
         <!--JQUERY-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -14,36 +14,39 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
         <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
         <!-- Nuestro css-->
-        <link rel="stylesheet" type="text/css" th:href="@{../login.css}">
+        <link rel="stylesheet" type="text/css" th:href="@{../register.css}">
 
     </head>
     <body>
-        <div id ="">
-
-        </div>
         <div class="modal-dialog text-center">
             <div class="col-sm-8 main-section">
                 <div class="modal-content">
                     <div class="col-12 user-img">
-                        <img src="https://cdn.iconscout.com/icon/free/png-256/laptop-user-1-1179329.png" srcset="https://cdn.iconscout.com/icon/free/png-512/laptop-user-1-1179329.png 2x" alt="Laptop User Icon" witdh ="20">
+                        <img src="https://cdn.iconscout.com/icon/free/png-256/laptop-user-1-1179329.png" srcset="https://cdn.iconscout.com/icon/free/png-512/laptop-user-1-1179329.png 2x" alt="Laptop User Icon" >
                     </div>
-                    <form th:action="@{/ingreso}" th:object="${usuario}" method="POST">
+                    <form th:action="@{/register}" th:object="${usuario}" method="POST">
 
                         <div class="form-group" id="user-group">
-                            <input type="text" class="form-control" placeholder="Nombre de usuario" name="email"/>
+                            <input type="text" class="form-control" placeholder="Ingresa tu Email" name="email"/>
                         </div>
+
                         <div class="form-group" id="contrasena-group">
                             <input type="password" class="form-control" placeholder="Contrasena" name="password"/>
                         </div>
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i>  Ingresar </button>
+
+                        <div class="form-group" id="contrasena-group">
+                            <input type="password" class="form-control" placeholder="Confirma contraseña"  name="password_2"/>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i>  Registrar </button>
                     </form>
-                    <div class="col-12 forgot">
-                        <p><a href="#">Recordar contrasena?</a></p>
-                        <p><a href="../templates/register.html" th:href="@{/register}">Crear Usuario - Registrarse</a>
-                    </div>
                     <div class="alert alert-warning m-2" role="alert" th:text="${error}" th:unless="${error == null}"></div>
-                    <div class="alert alert-primary m-2" role="alert" th:text="${param.status}" th:unless="${param.status == null}"></div>
-                    <div class="alert alert-success m-2" role="alert" th:text="${info}" th:unless="${info == null}"></div>
+                    <div class="col-12 forgot">
+                        <p><a th:href="@{/login}">¿Ya tiene una cuenta? Inicia Sesión</a>
+                    </div>
+
+
                 </div>
             </div>
         </div>

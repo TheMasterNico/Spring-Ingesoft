@@ -18,7 +18,7 @@ import javax.persistence.*;
 public class TypeDevice implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long id; 
+    private int id; 
     @Column(unique = true)
     private String name;
     @Column(nullable = true)
@@ -30,11 +30,11 @@ public class TypeDevice implements Serializable {
     public TypeDevice() {
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

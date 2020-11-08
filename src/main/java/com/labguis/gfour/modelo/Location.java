@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Location {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long id;
+    private int id;
     @Column(unique = true)
     private String number_id;
     private String name;
@@ -30,11 +30,11 @@ public class Location {
         this.number_id = number_id;
     }
        
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -13,45 +13,58 @@ public class MigratedDevice {
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long id;    
+    private int id;        
+    @ManyToOne
+    private User user; // the usar responsible
+    @ManyToOne
+    private User updateUser; // the user that edit
+    @ManyToOne
+    private User ownerUser; // the user that created the item
+    private LocalDateTime registerTime;  
+    private LocalDateTime updateTime;  
+    
+    
     @ManyToOne
     private TypeDevice typeDevice;
     @ManyToOne
-    private Location location;
-    @ManyToOne
-    private User user;
-    @ManyToOne
-    private User updateUser;
-    @ManyToOne
-    private User ownerUser;
-    @ManyToOne
     private Agencie agencie;
+    @ManyToOne
+    private Location location;
     
-    @Column(nullable = false, unique = true)
-    private String standarKey;
-    @Column(nullable = false, unique = true)
-    private String invPlate;
-    private String switchIP;
-    private String newIP;
-    private String oldIP;
     private int classRoom;
-    
-    private LocalDateTime registerTime;    
     @Column(nullable = true)
     private String description;
+    @Column(nullable = false, unique = true)
+    private String invPlate;
+    private String oldIP;
+    private String newIP;
+    private String switchIP;
     @Column(nullable = true)
-    private String MAC;
+    private String port; 
     @Column(nullable = true)
-    private String port;
+    private String MAC;    
+    @Column(nullable = false, unique = true)
+    private String standarKey;
+    
+     
 
     public MigratedDevice() {
     }
+    
 
-    public long getId() {
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

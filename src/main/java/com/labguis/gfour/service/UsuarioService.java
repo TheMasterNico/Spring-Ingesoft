@@ -138,4 +138,20 @@ public class UsuarioService implements IUsuarioService {
         return false;
     }
 
+    @Override
+    public User findByCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            int id = 0;
+            for (Cookie cookie : cookies) {
+                if ("Hash-2".equals(cookie.getName())) {
+                    id = Integer.valueOf(cookie.getValue());
+                }
+            }
+            Optional<User> user = data.findById(id);
+            return user.get();
+        }
+        return null;
+    }
+
 }

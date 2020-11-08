@@ -5,18 +5,23 @@ import com.labguis.gfour.interfaceService.IDeviceService;
 import com.labguis.gfour.interfaceService.ILocationService;
 import com.labguis.gfour.interfaceService.ITypeDeviceService;
 import com.labguis.gfour.interfaceService.IUsuarioService;
+import com.labguis.gfour.interfaceService.InterfaceWhiteList;
 import com.labguis.gfour.modelo.Agencie;
 import com.labguis.gfour.modelo.Location;
 import com.labguis.gfour.modelo.MigratedDevice;
 import com.labguis.gfour.modelo.TypeDevice;
 import com.labguis.gfour.modelo.User;
+import com.labguis.gfour.modelo.WhiteList;
+import com.labguis.gfour.repository.UserRepository;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -28,6 +33,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.apache.commons.codec.binary.Hex;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  *
@@ -48,34 +59,64 @@ public class DeviceController {
     private IUsuarioService ius;
     @Autowired
     private ITypeDeviceService itds;
+    @Autowired
+    private InterfaceWhiteList iwl;
 
     @GetMapping("/equipos")
-    public String equipos(Model model, HttpServletRequest request) {        
-        if(!ius.isUserLogged(request)) { // if not logged
+    public String equipos(Model model, HttpServletRequest request, @RequestParam(required = false) String edit) {
+        if (!ius.isUserLogged(request)) { // if not logged
             return "redirect:/login";
-        }        
+        }
         List<MigratedDevice> devices = ids.listar();
-        
+
         model.addAttribute("datos", devices);
         model.addAttribute("isadmin", ius.isUserAdmin(request));
+        model.addAttribute("device", edit != null ? ids.findByInvPlate(edit) : new MigratedDevice()); // if is edit send specific device, if not, send new empty one
+        model.addAttribute("agencies", ias.listar());
+        model.addAttribute("typeDevices", itds.listar());
+        model.addAttribute("locations", ils.listar());
+        model.addAttribute("users", ius.listar());
         return "equipos";
     }
 
-    @GetMapping("/populate")
-    public String populate(Model model) {
-        migration();
-        return "login";
+    @PostMapping("/device/save")
+    public String save(@Validated MigratedDevice p, Model model, HttpServletRequest request) {
+        p.setRegisterTime(LocalDateTime.now());
+        p.setUpdateTime(LocalDateTime.now());
+        p.setOwnerUser(ius.findByCookie(request));
+        p.setUpdateUser(ius.findByCookie(request));
+        int id = ids.save(p);
+        if (id == 0) {
+            return "redirect:/equipos";
+        }
+        return "redirect:/equipos";
     }
 
+    @GetMapping("/device/delete/{id}")
+    public String eliminar(@PathVariable int id, Model model, HttpServletRequest request) {
+        if (!ius.isUserLogged(request)) { // if not logged
+            return "redirect:/login";
+        }
+        eliminar(id);
+        return "redirect:/equipos";
+    }
 
-    
+    public void eliminar(int id) {
+        ids.delete(id);
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     public void migration() {
-        
+
         System.err.println("Wait for the start...");
-        if (ius.findByName("Servidor") == null) {
+        if (ius.findByName("Usuario inicial") == null) {
+
+            WhiteList wl = new WhiteList();
+            wl.setEmail("email@testing.com");
+            iwl.save(wl);
+
             User u = new User();
-            u.setName("Servidor");
+            u.setName("Usuario inicial");
             u.setEmail("email@testing.com");
             u.setPassword(ius.hashPassword("password"));
             ius.save(u);
@@ -216,7 +257,7 @@ public class DeviceController {
                 location = new Location();
                 location.setNumber_id(lugare[0]);
                 location.setName(lugare[1]);
-                location.setUser(ius.findByName("Servidor"));
+                location.setUser(ius.findByName("Usuario inicial"));
                 ils.save(location);
             }
         }
@@ -224,7 +265,7 @@ public class DeviceController {
             TypeDevice type = new TypeDevice();
             type.setName("Computador de mesa");
             type.setDescription("Computador sobre escritorio con pantalla, teclado, mouse y torre");
-            type.setUser(ius.findByName("Servidor"));
+            type.setUser(ius.findByName("Usuario inicial"));
             itds.save(type);
         }
         if (ids.findByInvPlate("115599") == null) {
@@ -237,14 +278,34 @@ public class DeviceController {
             m.setMAC("C2:Ms:d4");
             m.setNewIP("10.159.156.12");
             m.setOldIP("192.168.1.6");
-            m.setOwnerUser(ius.findByName("Servidor"));
+            m.setOwnerUser(ius.findByName("Usuario inicial"));
             m.setPort("1594862");
             m.setRegisterTime(LocalDateTime.now());
             m.setStandarKey("BBxx015dh2ed45thr5");
             m.setSwitchIP("184.255.23.24");
             m.setTypeDevice(itds.findByName("Computador de mesa"));
-            m.setUpdateUser(ius.findByName("Servidor"));
-            m.setUser(ius.findByName("Servidor"));
+            m.setUpdateUser(ius.findByName("Usuario inicial"));
+            m.setUser(ius.findByName("Usuario inicial"));
+            ids.save(m);
+        }
+        if (ids.findByInvPlate("123456") == null) {
+            MigratedDevice m = new MigratedDevice();
+            m.setAgencie(ias.findByName(names[2]));
+            m.setClassRoom(531);
+            m.setDescription("Descripcion cortita");
+            m.setInvPlate("123456");
+            m.setLocation(ils.findByName("Facultad de Ingeniería"));
+            m.setMAC("00:0a:95:9d:68:16");
+            m.setNewIP("186.154.32.212");
+            m.setOldIP("172.16.255.254");
+            m.setOwnerUser(ius.findByName("Usuario inicial"));
+            m.setPort("654321");
+            m.setRegisterTime(LocalDateTime.now());
+            m.setStandarKey("BB123dh2ed45thr5");
+            m.setSwitchIP("184.255.23.24");
+            m.setTypeDevice(itds.findByName("Computador de mesa"));
+            m.setUpdateUser(ius.findByName("Usuario inicial"));
+            m.setUser(ius.findByName("Usuario inicial"));
             ids.save(m);
         }
         System.out.println("Success Start!");

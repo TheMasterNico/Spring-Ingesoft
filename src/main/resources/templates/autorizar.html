@@ -47,11 +47,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="i:${whitelists}">
+                                <tr th:each="i:${whitelists}" th:if="${i.email} != 'email@testing.com'">
                                     <td th:text="${i.id}"></td>
                                     <td th:text="${i.email}"></td>
                                     <td>
-                                        <a class="btn btn-danger" th:onclick="eliminarWL([[${i.id}]])" href="#">Eliminar</a>
+                                        <button class="btn btn-danger" th:onclick="eliminar([[${i.id}]], '/deleteWL/', '/autorizar')">Eliminar</button>
                                     </td>
                                 </tr>
                             </tbody>

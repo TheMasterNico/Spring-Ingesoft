@@ -24,4 +24,5 @@ public interface IUsuarioService {
     boolean isUserLogged(HttpServletRequest request);
     boolean checkWhiteList(String email);
     public boolean isUserAdmin(HttpServletRequest request);
+    User findByCookie(HttpServletRequest request);
 }

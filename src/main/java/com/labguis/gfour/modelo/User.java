@@ -17,8 +17,18 @@ public class User {
     private String email;
     private String name;
     private String password;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean responsible;
 
     public User() {
+    }
+
+    public Boolean getResponsible() {
+        return responsible;
+    }
+
+    public void setResponsible(Boolean responsible) {
+        this.responsible = responsible;
     }
 
     public int getId() {

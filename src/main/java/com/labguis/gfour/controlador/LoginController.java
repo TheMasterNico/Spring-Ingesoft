@@ -35,6 +35,9 @@ public class LoginController {
             case 2:
                 model.addAttribute("error", "Datos incorrectos");
                 break;
+            case 3:
+                model.addAttribute("error", "El correo  " + user.getEmail() + " no esta autorizado");
+                break;
             default:
                 Cookie cookie = new Cookie("Hash-1", service.hashPassword(user.getEmail()));
                 cookie.setMaxAge(1 * 24 * 60 * 60); // expire in 1 day
@@ -56,6 +59,9 @@ public class LoginController {
         }
         if (!user_to_check.getPassword().equals(service.hashPassword(user.getPassword()))) {
             return 2;
+        }
+        if (!service.checkWhiteList(user.getEmail())) {
+            return 3;
         }
         return 0; // Al ok
     }

@@ -3,6 +3,7 @@ package com.labguis.gfour.service;
 import com.labguis.gfour.interfaceService.IAgencieService;
 import com.labguis.gfour.repository.IAgencie;
 import com.labguis.gfour.modelo.Agencie;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,11 @@ public class AgencieService implements IAgencieService{
     @Override
     public Agencie findByName(String name) {
         return data.findByName(name);
+    }
+
+    @Override
+    public List<Agencie> listar() {
+        return (List<Agencie>)data.findAll();
     }
 
 }

@@ -1,205 +1,217 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-	<title>Equipos Unal</title>
-	
-	<!--JQUERY-->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	
-	<!-- FRAMEWORK BOOTSTRAP para el estilo de la pagina-->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-	
-	<!-- Los iconos tipo Solid de Fontawesome-->
-	<link rel="stylesheet"
-		href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
-	<script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
-	
-	<!-- Nuestro css-->
+    <head>
+        <title>Equipos Unal</title>
+
+        <!--JQUERY-->
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <!-- FRAMEWORK BOOTSTRAP para el estilo de la pagina-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+
+        <!-- Los iconos tipo Solid de Fontawesome-->
+        <link rel="stylesheet"
+              href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+        <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
+        <!-- Nuestro css-->
         <link href="../static/equipos.css" th:href="@{../equipos.css}" rel="stylesheet" type="text/css"/>
         <!-- DATA TABLE -->
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">	
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-      <!-- SCRIPT PARA VER LA TABLA ORGANIZADA DE MEJOR MANERA -->
-<script type="text/javascript">
-    $(document).ready(function() {
-        //EN EL # VA EL NOMBRE DE LA TABLA DE ABAJO
-        $('#ListaEquipos').DataTable();
-    } );
-</script>
-</head>
+        <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">	
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+        
+    </head>
 
-<body>
-<div >
-<div class="mx-auto col-sm-12 main-section" id="myTab" role="tablist">
-    <ul class="nav nav-tabs ">
-        <li class="nav-item">
-        <a class ="btn btn-warning" th:href="@{/logout}">Salir</a>
-        <a class ="btn btn-warning" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
-	</li>   
-    </ul>
-    <ul class="nav nav-tabs justify-content-end">
-     
-	<li class="nav-item">
-	<a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="false">Equipos Migrados</a>
-	</li>
-	<li class="nav-item">
-	<a class="nav-link" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Agregar</a>				   	
-	</li>
-	</ul>
-<div class="tab-content" id="myTabContent">
-	<div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
-<div class="card">
-	<div class="card-header">
-		<h4>Equipos Migrados</h4>
-	</div>
-	<div class="card-body">
-            
-		<!-- Lista de eqipos-->
-                
-            <div class="table-responsive">
-                    <table id="ListaEquipos" class="table table-bordered table-hover table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>DEPENDENCIA</th>
-                                <th>EQUIPO</th>
-                                <th>MAC</th>
-                                <th>IP ANTIGUA</th>
-                                <th>IP NUEVA</th>
-                                <th>EDIFICIO</th>
-                                <th>RESPONSABLE</th>
-                                <th>SWITCH</th>
-                                <th>PUERTO</th>
-                                <th>PLACA</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="device:${datos}">
-                                <td th:text="${device.agencie.name}"></td>
-                                <td th:text="${device.TypeDevice.name}"></td>
-                                <td th:text="${device.MAC}"></td>
-                                <td th:text="${device.oldIP}"></td>
-                                <td th:text="${device.newIP}"></td>
-                                <td th:text="${device.location.name}"></td>
-                                <td th:text="${device.user.name}"></td>
-                                <td th:text="${device.switchIP}"></td>
-                                <td th:text="${device.port}"></td>
-                                <td th:text="${device.InvPlate}"></td>
-                                <td>
-                                    <a class="btn btn-warning">Editar</a>
+    <body>
+        <div class="mx-auto col-sm-12 main-section" id="myTab" role="tablist">
+            <ul class="nav nav-tabs ">
+                <li class="nav-item">
+                    <a class ="btn btn-warning" th:href="@{/logout}">Salir</a>
+                    <a class ="btn btn-warning" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
+                </li>   
+            </ul>
+            <ul class="nav nav-tabs justify-content-end">
 
-                                    <a class="btn btn-danger">Borrar</a>
-                                </td>
-                            </tr>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${param.edit == null ? 'active show' : ''}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="false">Equipos Migrados</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${param.edit != null ? 'active show' : ''}" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Agregar</a>				   	
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade" th:classappend="${param.edit == null ? 'active show' : ''}" id="list" role="tabpanel" aria-labelledby="list-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Equipos Migrados</h4>
+                        </div>
+                        <div class="card-body">
 
-                        </tbody>
-                    </table>
+                            <!-- Lista de eqipos-->
+
+                            <div class="table-responsive">
+                                <table id="ListaEquipos" class="table table-bordered table-hover table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>DEPENDENCIA</th>
+                                            <th>EQUIPO</th>
+                                            <th>MAC</th>
+                                            <th>IP ANTIGUA</th>
+                                            <th>IP NUEVA</th>
+                                            <th>EDIFICIO</th>
+                                            <th>RESPONSABLE</th>
+                                            <th>SWITCH</th>
+                                            <th>PUERTO</th>
+                                            <th>PLACA</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="device:${datos}">
+                                            <td th:text="${device.agencie.name}"></td>
+                                            <td th:text="${device.TypeDevice.name}"></td>
+                                            <td th:text="${device.MAC}"></td>
+                                            <td th:text="${device.oldIP}"></td>
+                                            <td th:text="${device.newIP}"></td>
+                                            <td th:text="${device.location.name}"></td>
+                                            <td th:text="${device.user.name}"></td>
+                                            <td th:text="${device.switchIP}"></td>
+                                            <td th:text="${device.port}"></td>
+                                            <td th:text="${device.InvPlate}"></td>
+                                            <td>
+                                                <a class="btn btn-warning" th:href="@{equipos?edit={id}(id=${device.InvPlate})}">Editar</a>
+                                                <button class="btn btn-danger" th:onclick="eliminar([[${device.id}]], '/device/delete/', '/equipos')">Borrar</button>
+
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" th:classappend="${param.edit != null ? 'active show' : ''}" id="form" role="tabpanel" aria-labelledby="form-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Agregar Equipo</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Agregar Equipos-->                                                      
+                            <form th:action="@{/device/save}"  class="form" th:object="${device}" method="POST">
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo</label>
+                                    <div class="col-lg-9">
+                                        <select class="form-control" name="typeDevice">
+                                            <option th:each="a:${typeDevices}" th:value="${a.id}" th:text="${a.name}"></option>
+                                        </select>
+                                    </div>
+                                </div> <!-- Tipo Equipo -->                                                
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Dependencia</label>
+                                    <div class="col-lg-9">
+                                        <select th:field="*{agencie}" class="form-control">
+                                            <option th:each="agencie:${agencies}" th:value="${agencie.id}" th:text="${agencie.name}"></option>
+                                        </select>
+                                    </div>
+                                </div> <!-- Dependencia -->
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Edificio</label>
+                                    <div class="col-lg-9">
+                                        <select class="form-control" name="location">
+                                            <option th:each="a:${locations}" th:value="${a.id}" th:text="${a.name}"></option>
+                                        </select>
+                                    </div>
+                                </div> <!-- Edificio -->
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Salon</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="number" name='classRoom'/>
+                                    </div>
+                                </div> <!-- Salon de clase -->
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Responsable</label>
+                                    <div class="col-lg-9">
+                                        <select class="form-control" name="user">
+                                            <option th:each="a:${users}" th:if="${a.responsible} == true" th:value="${a.id}" th:text="${a.name}"></option>
+                                        </select>
+                                    </div>
+                                </div> <!-- User Responsible -->
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Descripción</label>
+                                    <div class="col-lg-9">
+                                        <textarea class="form-control" name="description" rows="4" cols="50"></textarea>
+                                    </div>
+                                </div> <!-- Descripcion -->   
+
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Placa</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='invPlate'/>
+                                    </div>
+                                </div> <!-- Placa inventario -->
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">IP Vieja</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='oldIP' />
+                                    </div>
+                                </div> <!-- oldIP -->  
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">IP Nueva</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='newIP' />
+                                    </div>
+                                </div> <!-- newIP --> 
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Switch</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='switchIP' />
+                                    </div>
+                                </div> <!-- switchIP -->                                   
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Puerto</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='port'/>
+                                    </div>
+                                </div> <!-- Puerto --> 
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">MAC</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='MAC'/>
+                                    </div>
+                                </div> <!-- MAC --> 
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Clave estandar</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="text" name='standarKey'/>
+                                    </div>
+                                </div> <!-- standarKey --> 
+                                <div class="form-group row">
+                                    <div class="col-lg-12 text-center">
+                                        <input type="reset" class="btn btn-secondary" value="Cancelar">
+                                        <input type="submit" class="btn btn-primary" value="Agregar">
+                                    </div>
+                                </div>
+                            </form> 
+                        </div> 
+
+                    </div>
+                </div>
+            </div>
         </div>
 
-	</div>
-</div>
-	</div>
-        <div class="tab-pane fade" id="form" role="tabpanel" aria-labelledby="form-tab">
-            
-        <div class="card">
-	<div class="card-header">
-		<h4>Agregar Equipo</h4>
-	</div>
-	<div class="card-body">
-		
-            <!-- Agregar Equipos-->
- <div >        
-   <table class ="table">
-    <tbody>
-     <td>                       
-<form class="form" role="form" autocomplete="off">
-<div class="form-group row">
-    <label class="col-lg-3 col-form-label form-control-label">Dependencia</label>
-	<div class="col-lg-9">
-	<input class="form-control" type="text" >
-	</div>
-</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Equipo</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="text" >
-	</div>
-	</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Mac</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="email">
-	</div>
-	</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">IP Antigua</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="text">
-	</div>
-	</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">IP Nueva</label>
-	<div class="col-lg-9">
-	   <input class="form-control" type="text">
-	</div>
-	</div>
-	
-</form>
-   </td>
- <td> 
-     <div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Edificio</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="text" >
-	</div>
-	</div>
-     <form class="form" role="form" autocomplete="off">
-<div class="form-group row">
-    <label class="col-lg-3 col-form-label form-control-label">Responsable</label>
-	<div class="col-lg-9">
-	<input class="form-control" type="text" >
-	</div>
-</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Switch</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="text" >
-	</div>
-	</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Puerto</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="email">
-	</div>
-	</div>
-	<div class="form-group row">
-	<label class="col-lg-3 col-form-label form-control-label">Placa</label>
-	<div class="col-lg-9">
-	    <input class="form-control" type="text">
-	</div>
-	</div>
-</form> 
-   </td>
- </table> 
-     <div class="form-group row">
-	    <div class="col-lg-12 text-center">
-		<input type="reset" class="btn btn-secondary" value="Cancelar">
-		<input type="button" class="btn btn-primary" value="Agregar">
-	    </div>
-	</div>
-</div> 
- 
-	</div>
-</div>
-	</div>
-</div>
-</div>
-</div>
-</body>
+
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="/funciones.js"></script>
+    </body>
 </html>

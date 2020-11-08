@@ -29,25 +29,4 @@ public class Controlador {
         model.addAttribute("usuarios", usuarios);
         return "index";
     }
-    
-    @GetMapping("/new")
-    public String nuevo(Model model) {
-        model.addAttribute("persona", new User());
-        return "form";
-    }
-
-    @PostMapping("/save")
-    public String save(@Validated User p,Model model) {
-            int id=service.save(p);
-            if(id==0) {
-                    return "form";
-            }
-            return "redirect:/listar";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String eliminar(@PathVariable int id,Model model) {
-            service.delete(id);
-            return "redirect:/listar";
-    }
 }

@@ -1,6 +1,7 @@
 package com.labguis.gfour.interfaceService;
 
 import com.labguis.gfour.modelo.TypeDevice;
+import java.util.List;
 
 /**
  *
@@ -8,5 +9,6 @@ import com.labguis.gfour.modelo.TypeDevice;
  */
 public interface ITypeDeviceService {
     public int save(TypeDevice td);
+    public List<TypeDevice>listar();
     TypeDevice findByName(String name);
 }

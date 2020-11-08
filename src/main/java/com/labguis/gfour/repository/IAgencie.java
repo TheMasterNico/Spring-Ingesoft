@@ -1,4 +1,4 @@
-package com.labguis.gfour.repository;
+     package com.labguis.gfour.repository;
 
 import com.labguis.gfour.modelo.Agencie;
 import org.springframework.data.repository.CrudRepository;

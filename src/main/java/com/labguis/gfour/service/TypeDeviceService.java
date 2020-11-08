@@ -3,6 +3,7 @@ package com.labguis.gfour.service;
 import com.labguis.gfour.interfaceService.ITypeDeviceService;
 import com.labguis.gfour.repository.ITypeDevice;
 import com.labguis.gfour.modelo.TypeDevice;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,11 @@ public class TypeDeviceService implements ITypeDeviceService{
     @Override
     public TypeDevice findByName(String name) {
         return data.findByName(name);
+    }
+
+    @Override
+    public List<TypeDevice> listar() {
+        return (List<TypeDevice>)data.findAll();
     }
 
 }

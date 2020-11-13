@@ -25,24 +25,42 @@
         <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">	
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
-        
+
     </head>
 
     <body>
-        <div class="mx-auto col-sm-12 main-section" id="myTab" role="tablist">
-            <ul class="nav nav-tabs ">
+        <div class="mx-auto col-sm-12 main-section pt-5" id="myTab" role="tablist">
+            <ul class="nav nav-tabs bg-light d-flex justify-content-start">
+                <li class="nav-item m-1">
+                    <a class ="btn btn-info" th:href="@{/logout}">Salir</a>
+                    <a class ="btn btn-info" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
+                </li> 
+            </ul> 
+            <ul class="nav nav-tabs bg-light d-flex justify-content-end" th:unless='${param.edit != null}'>
                 <li class="nav-item">
-                    <a class ="btn btn-warning" th:href="@{/logout}">Salir</a>
-                    <a class ="btn btn-warning" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
-                </li>   
-            </ul>
-            <ul class="nav nav-tabs justify-content-end">
-
-                <li class="nav-item">
-                    <a class="nav-link" th:classappend="${param.edit == null ? 'active show' : ''}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="false">Equipos Migrados</a>
+                    <a class="nav-link" 
+                       th:classappend="${param.edit == null ? 'active show' : ''}" 
+                       id="list-tab" 
+                       data-toggle="tab" 
+                       href="#list">Equipos Migrados</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${param.edit != null ? 'active show' : ''}" id="form-tab" data-toggle="tab" href="#form" role="tab" aria-controls="form" aria-selected="true">Agregar</a>				   	
+                    <a class="nav-link" 
+                       th:classappend="${param.edit != null ? 'active show' : ''}" 
+                       href="#form"
+                       id="form-tab" 
+                       data-toggle="tab" >Agregar</a>				   	
+                </li>
+            </ul>
+            <ul class="nav nav-tabs bg-light d-flex justify-content-end" th:unless='${param.edit == null}'>
+                <li class="nav-item">
+                    <a class="nav-link" 
+                       th:href="@{/equipos}">Volver</a>   
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active show"                        
+                       id="form-tab" 
+                       data-toggle="tab" >Modificar</a>				   	
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -106,10 +124,11 @@
                         <div class="card-body">
                             <!-- Agregar Equipos-->                                                      
                             <form th:action="@{/device/save}"  class="form" th:object="${device}" method="POST">
+                                <input type="text" th:field="*{id}" class="d-none" />
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" name="typeDevice">
+                                        <select class="form-control" th:field='*{typeDevice}'>
                                             <option th:each="a:${typeDevices}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
@@ -125,7 +144,7 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Edificio</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" name="location">
+                                        <select class="form-control" th:field='*{location}'>
                                             <option th:each="a:${locations}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
@@ -133,13 +152,13 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Salon</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="number" name='classRoom'/>
+                                        <input class="form-control" type="number" th:field='*{classRoom}'/>
                                     </div>
                                 </div> <!-- Salon de clase -->
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Responsable</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" name="user">
+                                        <select class="form-control" th:field='*{user}'>
                                             <option th:each="a:${users}" th:if="${a.responsible} == true" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
@@ -147,56 +166,56 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Descripción</label>
                                     <div class="col-lg-9">
-                                        <textarea class="form-control" name="description" rows="4" cols="50"></textarea>
+                                        <textarea class="form-control" th:field='*{description}' rows="4" cols="50"></textarea>
                                     </div>
                                 </div> <!-- Descripcion -->   
 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Placa</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='invPlate'/>
+                                        <input class="form-control" type="text" th:field='*{invPlate}'/>
                                     </div>
                                 </div> <!-- Placa inventario -->
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">IP Vieja</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='oldIP' />
+                                        <input class="form-control" type="text" th:field='*{oldIP}' />
                                     </div>
                                 </div> <!-- oldIP -->  
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">IP Nueva</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='newIP' />
+                                        <input class="form-control" type="text" th:field='*{newIP}' />
                                     </div>
                                 </div> <!-- newIP --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Switch</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='switchIP' />
+                                        <input class="form-control" type="text" th:field='*{switchIP}' />
                                     </div>
                                 </div> <!-- switchIP -->                                   
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Puerto</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='port'/>
+                                        <input class="form-control" type="text" th:field='*{port}'/>
                                     </div>
                                 </div> <!-- Puerto --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">MAC</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='MAC'/>
+                                        <input class="form-control" type="text" th:field='*{MAC}'/>
                                     </div>
                                 </div> <!-- MAC --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Clave estandar</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" name='standarKey'/>
+                                        <input class="form-control" type="text" th:field='*{standarKey}'/>
                                     </div>
                                 </div> <!-- standarKey --> 
                                 <div class="form-group row">
                                     <div class="col-lg-12 text-center">
                                         <input type="reset" class="btn btn-secondary" value="Cancelar">
-                                        <input type="submit" class="btn btn-primary" value="Agregar">
+                                        <input type="submit" class="btn btn-primary" th:value="${param.edit == null ? 'Agregar' : 'Actualizar'}" />
                                     </div>
                                 </div>
                             </form> 

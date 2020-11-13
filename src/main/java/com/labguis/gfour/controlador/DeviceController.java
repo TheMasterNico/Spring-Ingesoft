@@ -87,9 +87,9 @@ public class DeviceController {
         p.setUpdateUser(ius.findByCookie(request));
         int id = ids.save(p);
         if (id == 0) {
-            return "redirect:/equipos";
+            return "fail";
         }
-        return "redirect:/equipos";
+        return "ok";
     }
 
     @GetMapping("/device/delete/{id}")

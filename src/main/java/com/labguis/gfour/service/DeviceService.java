@@ -57,4 +57,9 @@ public class DeviceService implements IDeviceService {
         return data.findByInvPlate(inv_plate);
     }
 
+    @Override
+    public MigratedDevice findByStandarKey(String standarKey) {
+        return data.findByStandarKey(standarKey);
+    }
+
 }

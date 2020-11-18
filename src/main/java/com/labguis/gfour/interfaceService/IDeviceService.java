@@ -11,4 +11,5 @@ public interface IDeviceService {
     public int save(MigratedDevice u);
     public void delete(int id);
     MigratedDevice findByInvPlate(String inv_plate);
+    MigratedDevice findByStandarKey(String standarKey);
 }

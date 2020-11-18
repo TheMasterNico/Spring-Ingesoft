@@ -26,6 +26,12 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">	
         <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
 
+
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="/funciones.js"></script>
     </head>
 
     <body>
@@ -69,6 +75,7 @@
                         <div class="card-header">
                             <h4>Equipos Migrados</h4>
                         </div>
+                        <div class="alert alert-warning m-2" role="alert" th:text="${error}" th:unless="${error == null}"></div>
                         <div class="card-body">
 
                             <!-- Lista de eqipos-->
@@ -123,12 +130,18 @@
                         </div>
                         <div class="card-body">
                             <!-- Agregar Equipos-->                                                      
-                            <form th:action="@{/device/save}"  class="form" th:object="${device}" method="POST">
+                            <form th:action="${param.edit == null ? '/device/save' : '/device/update'}"  class="form" th:object="${device}" method="POST">
                                 <input type="text" th:field="*{id}" class="d-none" />
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" th:field='*{typeDevice}'>
+                                        <select class="form-control" name="typeDevice" th:unless="${param.edit == null}">
+                                            <option th:each="a: ${typeDevices}"
+                                                    th:selected ="${a.id} == *{typeDevice.id}"
+                                                    th:value="${a.id}" 
+                                                    th:text="${a.name}"></option>
+                                        </select>
+                                        <select class="form-control" th:field='*{typeDevice}' th:unless="${param.edit != null}">
                                             <option th:each="a:${typeDevices}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
@@ -136,7 +149,13 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Dependencia</label>
                                     <div class="col-lg-9">
-                                        <select th:field="*{agencie}" class="form-control">
+                                        <select class="form-control" name="agencie" id="agencie" th:unless="${param.edit == null}">
+                                            <option th:each="a:${agencies}"
+                                                    th:selected ="${a.getId()} == *{agencie.getId()}"
+                                                    th:value="${a.id}" 
+                                                    th:text="${a.name}"></option>
+                                        </select>
+                                        <select th:field="*{agencie}" class="form-control" th:unless="${param.edit != null}">
                                             <option th:each="agencie:${agencies}" th:value="${agencie.id}" th:text="${agencie.name}"></option>
                                         </select>
                                     </div>
@@ -144,7 +163,13 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Edificio</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" th:field='*{location}'>
+                                        <select class="form-control" name="location" th:unless="${param.edit == null}">
+                                            <option th:each="a:${locations}"
+                                                    th:selected ="${a.id} == *{location.id}"
+                                                    th:value="${a.id}" 
+                                                    th:text="${a.name}"></option>
+                                        </select>
+                                        <select class="form-control" th:field='*{location}' th:unless="${param.edit != null}">
                                             <option th:each="a:${locations}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
@@ -152,64 +177,70 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Salon</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="number" th:field='*{classRoom}'/>
+                                        <input class="form-control" type="number" name="classRoom" th:value='*{classRoom}' required/>
                                     </div>
                                 </div> <!-- Salon de clase -->
                                 <div class="form-group row">
-                                    <label class="col-lg-3 col-form-label form-control-label">Responsable</label>
+                                    <label class="col-lg-3 col-form-label form-control-label">Responsable de la sala</label>
                                     <div class="col-lg-9">
-                                        <select class="form-control" th:field='*{user}'>
-                                            <option th:each="a:${users}" th:if="${a.responsible} == true" th:value="${a.id}" th:text="${a.name}"></option>
+                                        <select class="form-control" name="user" th:unless="${param.edit == null}">
+                                            <option th:each="a: ${users}"
+                                                    th:selected ="${a.id} == *{user.id}"
+                                                    th:value="${a.id}" 
+                                                    th:text="${a.name}"></option>
+                                        </select>
+                                        <select class="form-control" th:field='*{user}' th:unless="${param.edit != null}">
+                                            <option th:each="a:${users}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
                                     </div>
                                 </div> <!-- User Responsible -->
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Descripción</label>
                                     <div class="col-lg-9">
-                                        <textarea class="form-control" th:field='*{description}' rows="4" cols="50"></textarea>
+                                        <textarea class="form-control" name="description" th:text='*{description}' rows="4" cols="50"></textarea>
                                     </div>
                                 </div> <!-- Descripcion -->   
 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Placa</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{invPlate}'/>
+                                        <input class="form-control" type="text" name="invPlate" th:value='*{invPlate}' required/>
                                     </div>
                                 </div> <!-- Placa inventario -->
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">IP Vieja</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{oldIP}' />
+                                        <input class="form-control" type="text" name="oldIP" th:value='*{oldIP}' required/>
                                     </div>
                                 </div> <!-- oldIP -->  
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">IP Nueva</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{newIP}' />
+                                        <input class="form-control" type="text" name="newIP" th:value='*{newIP}' required/>
                                     </div>
                                 </div> <!-- newIP --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Switch</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{switchIP}' />
+                                        <input class="form-control" type="text" name="switchIP" th:value='*{switchIP}' required/>
                                     </div>
                                 </div> <!-- switchIP -->                                   
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Puerto</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{port}'/>
+                                        <input class="form-control" type="text" name="port" th:value='*{port}' required/>
                                     </div>
                                 </div> <!-- Puerto --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">MAC</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{MAC}'/>
+                                        <input class="form-control" type="text" name="MAC" th:value='*{MAC}' required/>
                                     </div>
                                 </div> <!-- MAC --> 
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Clave estandar</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="text" th:field='*{standarKey}'/>
+                                        <input class="form-control" type="text" name="standarKey" th:value='*{standarKey}' required/>
                                     </div>
                                 </div> <!-- standarKey --> 
                                 <div class="form-group row">
@@ -227,10 +258,6 @@
         </div>
 
 
-        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        <script src="/funciones.js"></script>
+
     </body>
 </html>

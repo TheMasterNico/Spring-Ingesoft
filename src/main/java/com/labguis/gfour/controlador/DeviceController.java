@@ -15,6 +15,7 @@ import com.labguis.gfour.modelo.WhiteList;
 import com.labguis.gfour.repository.UserRepository;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.apache.commons.codec.binary.Hex;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -67,9 +72,7 @@ public class DeviceController {
         if (!ius.isUserLogged(request)) { // if not logged
             return "redirect:/login";
         }
-        List<MigratedDevice> devices = ids.listar();
-
-        model.addAttribute("datos", devices);
+        model.addAttribute("datos", ids.listar());
         model.addAttribute("isadmin", ius.isUserAdmin(request));
         model.addAttribute("device", edit != null ? ids.findByInvPlate(edit) : new MigratedDevice()); // if is edit send specific device, if not, send new empty one
         model.addAttribute("agencies", ias.listar());
@@ -85,11 +88,35 @@ public class DeviceController {
         p.setUpdateTime(LocalDateTime.now());
         p.setOwnerUser(ius.findByCookie(request));
         p.setUpdateUser(ius.findByCookie(request));
-        int id = ids.save(p);
-        if (id == 0) {
-            return "fail";
+        MigratedDevice check_inv = ids.findByInvPlate(p.getInvPlate());
+        MigratedDevice check_stk = ids.findByStandarKey(p.getStandarKey());
+        if(check_inv != null) {
+            model.addAttribute("error", "La placa de inventario ya existe");
         }
-        return "ok";
+        else if(check_stk != null) {
+            model.addAttribute("error", "La clave estandar ya existe");
+        }
+        else {
+            ids.save(p);
+            return "redirect:/equipos";            
+        }
+        // the models next, its same in /equipos
+        model.addAttribute("datos", ids.listar());
+        model.addAttribute("isadmin", ius.isUserAdmin(request));
+        model.addAttribute("device", new MigratedDevice()); 
+        model.addAttribute("agencies", ias.listar());
+        model.addAttribute("typeDevices", itds.listar());
+        model.addAttribute("locations", ils.listar());
+        model.addAttribute("users", ius.listar());
+        return "equipos";
+    }
+
+    @PostMapping("/device/update")
+    public String update(@Validated MigratedDevice p, Model model, HttpServletRequest request) {
+        p.setUpdateTime(LocalDateTime.now());
+        p.setUpdateUser(ius.findByCookie(request));
+        ids.save(p);
+        return "redirect:/equipos";
     }
 
     @GetMapping("/device/delete/{id}")
@@ -268,45 +295,33 @@ public class DeviceController {
             type.setUser(ius.findByName("Usuario inicial"));
             itds.save(type);
         }
-        if (ids.findByInvPlate("115599") == null) {
-            MigratedDevice m = new MigratedDevice();
-            m.setAgencie(ias.findByName(names[0]));
-            m.setClassRoom(211);
-            m.setDescription("Descripcion cortita");
-            m.setInvPlate("115599");
-            m.setLocation(ils.findByName("Unibiblos"));
-            m.setMAC("C2:Ms:d4");
-            m.setNewIP("10.159.156.12");
-            m.setOldIP("192.168.1.6");
-            m.setOwnerUser(ius.findByName("Usuario inicial"));
-            m.setPort("1594862");
-            m.setRegisterTime(LocalDateTime.now());
-            m.setStandarKey("BBxx015dh2ed45thr5");
-            m.setSwitchIP("184.255.23.24");
-            m.setTypeDevice(itds.findByName("Computador de mesa"));
-            m.setUpdateUser(ius.findByName("Usuario inicial"));
-            m.setUser(ius.findByName("Usuario inicial"));
-            ids.save(m);
+        if (itds.findByName("Portatil") == null) {
+            TypeDevice type = new TypeDevice();
+            type.setName("Portatil");
+            type.setDescription("Descripción Portatil");
+            type.setUser(ius.findByName("Usuario inicial"));
+            itds.save(type);
         }
-        if (ids.findByInvPlate("123456") == null) {
-            MigratedDevice m = new MigratedDevice();
-            m.setAgencie(ias.findByName(names[2]));
-            m.setClassRoom(531);
-            m.setDescription("Descripcion cortita");
-            m.setInvPlate("123456");
-            m.setLocation(ils.findByName("Facultad de Ingeniería"));
-            m.setMAC("00:0a:95:9d:68:16");
-            m.setNewIP("186.154.32.212");
-            m.setOldIP("172.16.255.254");
-            m.setOwnerUser(ius.findByName("Usuario inicial"));
-            m.setPort("654321");
-            m.setRegisterTime(LocalDateTime.now());
-            m.setStandarKey("BB123dh2ed45thr5");
-            m.setSwitchIP("184.255.23.24");
-            m.setTypeDevice(itds.findByName("Computador de mesa"));
-            m.setUpdateUser(ius.findByName("Usuario inicial"));
-            m.setUser(ius.findByName("Usuario inicial"));
-            ids.save(m);
+        if (itds.findByName("Impresora HP") == null) {
+            TypeDevice type = new TypeDevice();
+            type.setName("Impresora HP");
+            type.setDescription("Descripción Impresora HP");
+            type.setUser(ius.findByName("Usuario inicial"));
+            itds.save(type);
+        }
+        if (itds.findByName("Impresora LASER") == null) {
+            TypeDevice type = new TypeDevice();
+            type.setName("Impresora LASER");
+            type.setDescription("Descripción Impresora LASER");
+            type.setUser(ius.findByName("Usuario inicial"));
+            itds.save(type);
+        }
+        if (itds.findByName("TELEVISOR LG") == null) {
+            TypeDevice type = new TypeDevice();
+            type.setName("TELEVISOR LG");
+            type.setDescription("Descripción TELEVISOR LG");
+            type.setUser(ius.findByName("Usuario inicial"));
+            itds.save(type);
         }
         System.out.println("Success Start!");
     }

@@ -32,6 +32,13 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="/funciones.js"></script>
+
+        <style>
+            table tr:nth-child(4n-1), table tr:nth-child(4n)  {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+        </style>
+
     </head>
 
     <body>
@@ -84,38 +91,55 @@
                                 <table id="ListaEquipos" class="table table-bordered table-hover table-striped">
                                     <thead class="thead-dark">
                                         <tr>
-                                            <th>DEPENDENCIA</th>
-                                            <th>EQUIPO</th>
-                                            <th>MAC</th>
-                                            <th>IP ANTIGUA</th>
-                                            <th>IP NUEVA</th>
-                                            <th>EDIFICIO</th>
-                                            <th>RESPONSABLE</th>
-                                            <th>SWITCH</th>
-                                            <th>PUERTO</th>
                                             <th>PLACA</th>
+                                            <th>EQUIPO</th>
+                                            <th>DEPENDENCIA</th>
+                                            <th>EDIFICIO</th>
+                                            <th>IP NUEVA</th>
+                                            <th>RESPONSABLE</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr th:each="device:${datos}">
-                                            <td th:text="${device.agencie.name}"></td>
-                                            <td th:text="${device.TypeDevice.name}"></td>
-                                            <td th:text="${device.MAC}"></td>
-                                            <td th:text="${device.oldIP}"></td>
-                                            <td th:text="${device.newIP}"></td>
-                                            <td th:text="${device.location.name}"></td>
-                                            <td th:text="${device.user.name}"></td>
-                                            <td th:text="${device.switchIP}"></td>
-                                            <td th:text="${device.port}"></td>
+                                    <tbody th:each="device:${datos}">
+                                        <tr>
                                             <td th:text="${device.InvPlate}"></td>
+                                            <td th:text="${device.TypeDevice.name}"></td>
+                                            <td th:text="${device.agencie.name}"></td>
+                                            <td th:text="${device.location.name}"></td>
+                                            <td th:text="${device.newIP}"></td>
+                                            <td th:text="${device.user.name}"></td>
+
                                             <td>
+                                                <button 
+                                                    class="btn btn-primary" 
+                                                    type="button" 
+                                                    data-toggle="collapse" 
+                                                    th:data-target="${'#inv-'+device.InvPlate}" 
+                                                    aria-expanded="false" 
+                                                    th:aria-controls="${'inv-'+device.InvPlate}">
+                                                    Ver más
+                                                </button>
                                                 <a class="btn btn-warning" th:href="@{equipos?edit={id}(id=${device.InvPlate})}">Editar</a>
                                                 <button class="btn btn-danger" th:onclick="eliminar([[${device.id}]], '/device/delete/', '/equipos')">Borrar</button>
-
                                             </td>
                                         </tr>
-
+                                        <tr class="collapse" th:id="${'inv-'+device.InvPlate}">
+                                            <td class="card-body" colspan='7'>
+                                                <ul class="list-group">
+                                                    <li class="list-group-item" th:text="${'Salon: '+device.ClassRoom}"></li>
+                                                    <li class="list-group-item" th:text="${'Descripción: '+device.description}"></li>
+                                                    <li class="list-group-item" th:text="${'IP Antigua: '+device.oldIP}"></li>
+                                                    <li class="list-group-item" th:text="${'Switch: '+device.switchIP}"></li>
+                                                    <li class="list-group-item" th:text="${'Puerto: '+device.port}"></li>
+                                                    <li class="list-group-item" th:text="${'MAC: '+device.MAC}"></li>
+                                                    <li class="list-group-item" th:text="${'Clave Estandar: '+device.StandarKey}"></li>
+                                                    <li class="list-group-item" th:text="${'Fecha de creación: '+device.RegisterTime}"></li>
+                                                    <li class="list-group-item" th:text="${'fecha de actualización: '+device.UpdateTime}"></li>
+                                                    <li class="list-group-item" th:text="${'Usuario creador: '+device.OwnerUser.name}"></li>
+                                                    <li class="list-group-item" th:text="${'Usuario que actualiza: '+device.UpdateUser.name}"></li>
+                                                </ul>                                                
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -132,6 +156,8 @@
                             <!-- Agregar Equipos-->                                                      
                             <form th:action="${param.edit == null ? '/device/save' : '/device/update'}"  class="form" th:object="${device}" method="POST">
                                 <input type="text" th:field="*{id}" class="d-none" />
+                                <input type="text" th:field="*{OwnerUser}" class="d-none" />
+                                <input type="text" th:field="*{RegisterTime}" class="d-none" />
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo</label>
                                     <div class="col-lg-9">
@@ -257,7 +283,12 @@
             </div>
         </div>
 
-
+        <script>
+            $('.collapse').on('show.bs.collapse', function () {
+                $('.collapse').removeClass('show')
+                $(this).addClass('show')
+            })
+        </script>
 
     </body>
 </html>

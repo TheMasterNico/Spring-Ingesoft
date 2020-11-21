@@ -33,20 +33,14 @@
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="/funciones.js"></script>
 
-        <style>
-            table tr:nth-child(4n-1), table tr:nth-child(4n)  {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-        </style>
-
     </head>
 
     <body>
         <div class="mx-auto col-sm-12 main-section pt-5" id="myTab" role="tablist">
             <ul class="nav nav-tabs bg-light d-flex justify-content-start">
                 <li class="nav-item m-1">
-                    <a class ="btn btn-info" th:href="@{/logout}">Salir</a>
-                    <a class ="btn btn-info" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
+                    <a class ="btn btn-info active" th:href="@{/logout}">Salir</a>
+                    <a class ="btn btn-info active" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
                 </li> 
             </ul> 
             <ul class="nav nav-tabs bg-light d-flex justify-content-end" th:unless='${param.edit != null}'>
@@ -85,8 +79,8 @@
                         <div class="alert alert-warning m-2" role="alert" th:text="${error}" th:unless="${error == null}"></div>
                         <div class="card-body">
 
+                            <a target="_blank" class="btn btn-info active" th:href="@{/device/export}">Exportar datos</a>
                             <!-- Lista de eqipos-->
-
                             <div class="table-responsive">
                                 <table id="ListaEquipos" class="table table-bordered table-hover table-striped">
                                     <thead class="thead-dark">

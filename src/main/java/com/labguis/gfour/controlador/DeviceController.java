@@ -13,10 +13,14 @@ import com.labguis.gfour.modelo.TypeDevice;
 import com.labguis.gfour.modelo.User;
 import com.labguis.gfour.modelo.WhiteList;
 import com.labguis.gfour.repository.UserRepository;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.crypto.SecretKey;
@@ -24,6 +28,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -81,6 +86,21 @@ public class DeviceController {
         model.addAttribute("users", ius.listar());
         return "equipos";
     }
+    
+    @GetMapping("/device/export")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+         
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=equipos-" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        
+        DeviceExporter deviceExp = new DeviceExporter(ids.listar());
+        deviceExp.export(response);
+    }
+    
 
     @PostMapping("/device/save")
     public String save(@Validated MigratedDevice p, Model model, HttpServletRequest request) {

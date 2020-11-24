@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ITypeDevice extends CrudRepository<TypeDevice, Integer> {
-    TypeDevice findByName(String name);
+    TypeDevice findByName(String name);  
 }

@@ -78,6 +78,7 @@ public class DeviceController {
             return "redirect:/login";
         }
         model.addAttribute("datos", ids.listar());
+
         model.addAttribute("isadmin", ius.isUserAdmin(request));
         model.addAttribute("device", edit != null ? ids.findByInvPlate(edit) : new MigratedDevice()); // if is edit send specific device, if not, send new empty one
         model.addAttribute("agencies", ias.listar());
@@ -86,21 +87,33 @@ public class DeviceController {
         model.addAttribute("users", ius.listar());
         return "equipos";
     }
+
+    @GetMapping("/tipos")
+    public String tipos(Model model, HttpServletRequest request, @RequestParam(required = false) String edit) {
+        if (!ius.isUserLogged(request)) { // if not logged
+            return "redirect:/login";
+        }
+        model.addAttribute("datos", itds.listar());
+        model.addAttribute("device", edit != null ? itds.findByID(Integer.parseInt(edit)).get() : new TypeDevice()); // if is edit send specific device, if not, send new empty one
+        //TypeDevice Test =  itds.findByID(Integer.parseInt(edit)).get();
+        //System.out.println(Test.getName());
+        return "tipo";
+    }
     
+
     @GetMapping("/device/export")
     public void exportToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
-         
+
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=equipos-" + currentDateTime + ".xlsx";
         response.setHeader(headerKey, headerValue);
-        
+
         DeviceExporter deviceExp = new DeviceExporter(ids.listar());
         deviceExp.export(response);
     }
-    
 
     @PostMapping("/device/save")
     public String save(@Validated MigratedDevice p, Model model, HttpServletRequest request) {
@@ -110,26 +123,58 @@ public class DeviceController {
         p.setUpdateUser(ius.findByCookie(request));
         MigratedDevice check_inv = ids.findByInvPlate(p.getInvPlate());
         MigratedDevice check_stk = ids.findByStandarKey(p.getStandarKey());
-        if(check_inv != null) {
+        if (check_inv != null) {
             model.addAttribute("error", "La placa de inventario ya existe");
-        }
-        else if(check_stk != null) {
+        } else if (check_stk != null) {
             model.addAttribute("error", "La clave estandar ya existe");
-        }
-        else {
+        } else {
             ids.save(p);
-            return "redirect:/equipos";            
+            return "redirect:/equipos";
         }
         // the models next, its same in /equipos
         model.addAttribute("datos", ids.listar());
         model.addAttribute("isadmin", ius.isUserAdmin(request));
-        model.addAttribute("device", new MigratedDevice()); 
+        model.addAttribute("device", new MigratedDevice());
         model.addAttribute("agencies", ias.listar());
         model.addAttribute("typeDevices", itds.listar());
         model.addAttribute("locations", ils.listar());
         model.addAttribute("users", ius.listar());
         return "equipos";
     }
+
+    @PostMapping("/tipo/save")
+    public String savetype(@Validated TypeDevice p, Model model, HttpServletRequest request) {
+
+        TypeDevice check_name = itds.findByName(p.getName());
+
+        if (check_name != null) {
+            model.addAttribute("error", "Tipo de Equipo ya existe");
+        } else {
+            model.addAttribute("info", "Tipo de Equipo Agregado con exito");
+
+            itds.save(p);
+        }
+        // the models next, its same in /equipos
+        model.addAttribute("datos", itds.listar());
+        model.addAttribute("device", new TypeDevice());
+
+        return "tipo";
+    }
+      @GetMapping("/tipo/delete/{id}")
+    public String eliminartipo(@PathVariable int id, Model model, HttpServletRequest request) {
+        if (!ius.isUserLogged(request)) { // if not logged
+            return "redirect:/login";
+        }
+        itds.delete(id);
+        return "redirect:/tipos";
+    }
+      @PostMapping("/tipo/update")
+    public String updatetipo(@Validated TypeDevice p, Model model, HttpServletRequest request) {
+      
+        itds.save(p);
+        return "redirect:/tipos";
+    }
+
 
     @PostMapping("/device/update")
     public String update(@Validated MigratedDevice p, Model model, HttpServletRequest request) {

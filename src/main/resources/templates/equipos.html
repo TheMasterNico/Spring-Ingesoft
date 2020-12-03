@@ -41,6 +41,7 @@
                 <li class="nav-item m-1">
                     <a class ="btn btn-info active" th:href="@{/logout}">Salir</a>
                     <a class ="btn btn-info active" th:unless="${isadmin != true}" th:href="@{/autorizar}">Autorizar usuarios</a>     
+
                 </li> 
             </ul> 
             <ul class="nav nav-tabs bg-light d-flex justify-content-end" th:unless='${param.edit != null}'>
@@ -80,6 +81,9 @@
                         <div class="card-body">
 
                             <a target="_blank" class="btn btn-info active" th:href="@{/device/export}">Exportar datos</a>
+                            <form th:action="@{/device/import}" method="post" enctype="multipart/form-data">
+                                <input type="file" name="file" onchange="this.form.submit();">
+                            </form>                            
                             <!-- Lista de eqipos-->
                             <div class="table-responsive">
                                 <table id="ListaEquipos" class="table table-bordered table-hover table-striped">

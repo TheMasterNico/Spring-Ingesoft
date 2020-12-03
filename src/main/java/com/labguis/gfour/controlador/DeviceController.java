@@ -14,13 +14,16 @@ import com.labguis.gfour.modelo.User;
 import com.labguis.gfour.modelo.WhiteList;
 import com.labguis.gfour.repository.UserRepository;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import javax.crypto.SecretKey;
@@ -39,6 +42,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,6 +58,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -88,6 +98,7 @@ public class DeviceController {
         return "equipos";
     }
 
+
     @GetMapping("/tipos")
     public String tipos(Model model, HttpServletRequest request, @RequestParam(required = false) String edit) {
         if (!ius.isUserLogged(request)) { // if not logged
@@ -100,6 +111,38 @@ public class DeviceController {
         return "tipo";
     }
     
+    @PostMapping("/device/import")
+    public String importExcel(@RequestParam("file") MultipartFile file, Model model, HttpServletRequest request) throws IOException {
+        if (DeviceImporter.hasExcelFormat(file)) {
+
+            List<MigratedDevice> devices = excelData(file.getInputStream());
+            devices.forEach(device -> {
+                device.setRegisterTime(LocalDateTime.now());
+                device.setUpdateTime(LocalDateTime.now());
+                device.setOwnerUser(ius.findByCookie(request));
+                device.setUpdateUser(ius.findByCookie(request));
+                MigratedDevice check_inv = ids.findByInvPlate(device.getInvPlate());
+                MigratedDevice check_stk = ids.findByStandarKey(device.getStandarKey());
+                if (check_inv != null) {
+                    model.addAttribute("error", "La placa de inventario ya existe");
+                } else if (check_stk != null) {
+                    model.addAttribute("error", "La clave estandar ya existe");
+                } else {
+                    ids.save(device);
+                }
+            });
+
+        }        // the models next, its same in /equipos
+        model.addAttribute("datos", ids.listar());
+        model.addAttribute("isadmin", ius.isUserAdmin(request));
+        model.addAttribute("device", new MigratedDevice());
+        model.addAttribute("agencies", ias.listar());
+        model.addAttribute("typeDevices", itds.listar());
+        model.addAttribute("locations", ils.listar());
+        model.addAttribute("users", ius.listar());
+        return "equipos";
+
+    }
 
     @GetMapping("/device/export")
     public void exportToExcel(HttpServletResponse response) throws IOException {
@@ -389,6 +432,102 @@ public class DeviceController {
             itds.save(type);
         }
         System.out.println("Success Start!");
+    }
+
+    public List<MigratedDevice> excelData(InputStream is) {
+        try {
+            Workbook workbook = new XSSFWorkbook(is);
+
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rows = sheet.iterator();
+
+            List<MigratedDevice> list_devices = new ArrayList<MigratedDevice>();
+
+            int rowNumber = 0;
+            while (rows.hasNext()) {
+                Row currentRow = rows.next();
+                // skip header
+                if (rowNumber == 0) {
+                    rowNumber++;
+                    continue;
+                }
+                Iterator<Cell> cellsInRow = currentRow.iterator();
+                MigratedDevice device = new MigratedDevice();
+
+                int cellIdx = 0;
+                while (cellsInRow.hasNext()) {
+                    Cell currentCell = cellsInRow.next();
+                    currentCell.setCellType(CellType.STRING);
+                    String value = currentCell.getStringCellValue();
+                    switch (cellIdx) {
+                        case 0:
+                            device.setInvPlate(value);
+                            break;
+
+                        case 1:
+                            device.setTypeDevice(itds.findByName(value));
+                            break;
+
+                        case 2:
+                            device.setAgencie(ias.findByName(value));
+                            break;
+
+                        case 3:
+                            device.setLocation(ils.findByName(value));
+                            break;
+
+                        case 4:
+                            device.setNewIP(value);
+                            break;
+
+                        case 5: // user responsable
+                            device.setUser(ius.findByName(value));
+                            break;
+
+                        case 6:
+                            device.setClassRoom(Integer.parseInt(value));
+                            break;
+
+                        case 7:
+                            device.setDescription(value);
+                            break;
+
+                        case 8:
+                            device.setOldIP(value);
+                            break;
+
+                        case 9:
+                            device.setSwitchIP(value);
+                            break;
+
+                        case 10:
+                            device.setPort(value);
+                            break;
+
+                        case 11:
+                            device.setMAC(value);
+                            break;
+
+                        case 12:
+                            device.setStandarKey(value);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    cellIdx++;
+                }
+
+                list_devices.add(device);
+            }
+
+            workbook.close();
+
+            return list_devices;
+        } catch (IOException e) {
+            throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+        }
     }
 
 }

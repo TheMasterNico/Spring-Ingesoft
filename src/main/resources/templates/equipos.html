@@ -157,7 +157,10 @@
                                 <input type="text" th:field="*{OwnerUser}" class="d-none" />
                                 <input type="text" th:field="*{RegisterTime}" class="d-none" />
                                 <div class="form-group row">
-                                    <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo</label>
+                                    <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo
+                                    <a class ="btn btn-info active" th:href="@{/tipos}">Agregar+</a>
+
+                                    </label>
                                     <div class="col-lg-9">
                                         <select class="form-control" name="typeDevice" th:unless="${param.edit == null}">
                                             <option th:each="a: ${typeDevices}"
@@ -168,6 +171,7 @@
                                         <select class="form-control" th:field='*{typeDevice}' th:unless="${param.edit != null}">
                                             <option th:each="a:${typeDevices}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
+                                             
                                     </div>
                                 </div> <!-- Tipo Equipo -->                                                
                                 <div class="form-group row">
@@ -280,7 +284,6 @@
                 </div>
             </div>
         </div>
-
         <script>
             $('.collapse').on('show.bs.collapse', function () {
                 $('.collapse').removeClass('show')

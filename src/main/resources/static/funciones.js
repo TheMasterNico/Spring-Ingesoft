@@ -16,6 +16,11 @@ function eliminar(id, route, redirect) {
                     }).then(() => {
                         location.href = redirect;
                     });
+                },
+                error: function () {
+                    swal("Ocurrio un error, No se puede eliminar el registro", {
+                        icon: "warning",
+                    })
                 }
             });
 

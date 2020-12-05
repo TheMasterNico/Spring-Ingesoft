@@ -81,6 +81,30 @@ public class DeviceController {
         return "equipos";
     }
 
+    @PostMapping("/device/filter")
+    public String filterData(Model model, HttpServletRequest request,
+            @RequestParam(required = false) String agencie_name, 
+            @RequestParam(required = false) String inv_plate, 
+            @RequestParam(required = false) String location, 
+            @RequestParam(required = false) String new_ip, 
+            @RequestParam(required = false) String user
+        ) {
+        
+        if (!ius.isUserLogged(request)) { // if not logged
+            return "redirect:/login";
+        }
+        if(!agencie_name.isEmpty()) {
+            System.err.println(agencie_name);
+        }
+        model.addAttribute("datos", ids.listar());
+        model.addAttribute("isadmin", ius.isUserAdmin(request));
+        model.addAttribute("device", new MigratedDevice());
+        model.addAttribute("agencies", ias.listar());
+        model.addAttribute("typeDevices", itds.listar());
+        model.addAttribute("locations", ils.listar());
+        model.addAttribute("users", ius.listar());
+        return "equipos";
+    }
 
     @GetMapping("/tipos")
     public String tipos(Model model, HttpServletRequest request, @RequestParam(required = false) String edit) {
@@ -93,18 +117,18 @@ public class DeviceController {
         //System.out.println(Test.getName());
         return "tipo";
     }
-    
+
     @PostMapping("/device/import")
     public String importExcel(@RequestParam("file") MultipartFile file, Model model, HttpServletRequest request) throws IOException {
         if (DeviceImporter.hasExcelFormat(file)) {
 
             List<MigratedDevice> devices = excelData(file.getInputStream(), request);
             String errores = "";
-            for(MigratedDevice device : devices) {
-                if(device.getStandarKey() == null || 
-                        device.getInvPlate() == null || 
-                        device.getInvPlate().isEmpty() ||
-                        device.getStandarKey().isEmpty()) {
+            for (MigratedDevice device : devices) {
+                if (device.getStandarKey() == null
+                        || device.getInvPlate() == null
+                        || device.getInvPlate().isEmpty()
+                        || device.getStandarKey().isEmpty()) {
                     break;
                 }
                 device.setRegisterTime(LocalDateTime.now());
@@ -113,7 +137,7 @@ public class DeviceController {
                 device.setUpdateUser(ius.findByCookie(request));
                 MigratedDevice check_inv = ids.findByInvPlate(device.getInvPlate());
                 MigratedDevice check_stk = ids.findByStandarKey(device.getStandarKey());
-               
+
                 if (check_inv != null) {
                     errores += "La placa de inventario " + device.getInvPlate() + " ya existe<br/>";
                 } else if (check_stk != null) {
@@ -121,9 +145,10 @@ public class DeviceController {
                 } else {
                     ids.save(device);
                 }
-            }                
-            if(!errores.isEmpty()) model.addAttribute("error", errores);
-
+            }
+            if (!errores.isEmpty()) {
+                model.addAttribute("error", errores);
+            }
 
         }        // the models next, its same in /equipos
         model.addAttribute("datos", ids.listar());
@@ -196,7 +221,8 @@ public class DeviceController {
 
         return "tipo";
     }
-      @GetMapping("/tipo/delete/{id}")
+
+    @GetMapping("/tipo/delete/{id}")
     public String eliminartipo(@PathVariable int id, Model model, HttpServletRequest request) {
         if (!ius.isUserLogged(request)) { // if not logged
             return "redirect:/login";
@@ -204,13 +230,13 @@ public class DeviceController {
         itds.delete(id);
         return "redirect:/tipos";
     }
-      @PostMapping("/tipo/update")
+
+    @PostMapping("/tipo/update")
     public String updatetipo(@Validated TypeDevice p, Model model, HttpServletRequest request) {
-      
+
         itds.save(p);
         return "redirect:/tipos";
     }
-
 
     @PostMapping("/device/update")
     public String update(@Validated MigratedDevice p, Model model, HttpServletRequest request) {
@@ -433,9 +459,9 @@ public class DeviceController {
 
             List<MigratedDevice> list_devices = new ArrayList<>();
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-                
+
                 String sheetName = workbook.getSheetName(i);
-                
+
                 Sheet sheet = workbook.getSheetAt(i);
 
                 Iterator<Row> rows = sheet.iterator();
@@ -455,19 +481,18 @@ public class DeviceController {
                         Cell currentCell = cellsInRow.next();
                         currentCell.setCellType(CellType.STRING);
                         String value = currentCell.getStringCellValue();
-                        if(value.isEmpty() &&
-                                (cellIdx < 2 || cellIdx == 5 || cellIdx == 11)
-                            ) {// if not get required value
+                        if (value.isEmpty()
+                                && (cellIdx < 2 || cellIdx == 5 || cellIdx == 11)) {// if not get required value
                             continue;
-                        } 
+                        }
                         switch (cellIdx) {
                             case 0: // A
                                 device.setInvPlate(value);
                                 break;
 
                             case 1: // B
-                                TypeDevice tipo =itds.findByName(value);
-                                if(tipo == null) {
+                                TypeDevice tipo = itds.findByName(value);
+                                if (tipo == null) {
                                     tipo = new TypeDevice();
                                     tipo.setName(value);
                                     tipo.setUser(ius.findByCookie(request));
@@ -478,7 +503,7 @@ public class DeviceController {
 
                             case 2: // C
                                 Agencie dependencia = ias.findByName(value);
-                                if(dependencia == null) { // No existe, crear
+                                if (dependencia == null) { // No existe, crear
                                     dependencia = new Agencie();
                                     dependencia.setName(value);
                                     ias.save(dependencia);
@@ -488,10 +513,10 @@ public class DeviceController {
 
                             case 3: // D
                                 Location edificio = ils.findByNumberID(value);
-                                if(edificio == null) {
+                                if (edificio == null) {
                                     edificio = new Location();
                                     edificio.setNumberId(value);
-                                    edificio.setName("Edificio "+value);
+                                    edificio.setName("Edificio " + value);
                                     edificio.setUser(ius.findByCookie(request));
                                     ils.save(edificio);
                                 }
@@ -499,15 +524,15 @@ public class DeviceController {
                                 break;
 
                             case 4: // E
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setNewIP(value);
                                 break;
 
                             case 5: // F (Responsable)
-                                User responsable = ius.findByName(value);                                
-                                if(responsable == null) {
+                                User responsable = ius.findByName(value);
+                                if (responsable == null) {
                                     responsable = new User();
                                     responsable.setName(value);
                                     responsable.setEmail(value + "@temporalmail.com");
@@ -518,35 +543,35 @@ public class DeviceController {
                                 break;
 
                             case 6: // G
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setClassRoom(Integer.parseInt(value));
                                 break;
 
                             case 7: // H
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setOldIP(value);
                                 break;
 
                             case 8: // I
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setSwitchIP(value);
                                 break;
 
                             case 9: // J
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setPort(value);
                                 break;
 
                             case 10: // K
-                                if(value.isEmpty()) {
+                                if (value.isEmpty()) {
                                     value = "0";
                                 }
                                 device.setMAC(value);

@@ -35,13 +35,13 @@ public class LocationService implements ILocationService {
     }
 
     @Override
-    public Location findByID(String value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Location findByNumberID(String value) {
+        return data.findByNumberId(value);
     }
 
     @Override
-    public Location findByNumberID(String value) {
-        return data.findByNumberId(value);
+    public Location findByID(String value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

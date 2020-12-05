@@ -79,11 +79,72 @@
                         </div>
                         <div class="alert alert-warning m-2" role="alert" th:utext="${error}" th:unless="${error == null}"></div>
                         <div class="card-body">
+                            <div class="row py-3">
+                                <div class="col">
+                                    <a target="_blank" class="btn btn-info active" th:href="@{/device/export}">Exportar datos</a>
+                                </div>
+                                <div class="col">
+                                    <form th:action="@{/device/import}" method="post" enctype="multipart/form-data">
+                                        <input class="d-none" type="file" id="files" name="file" onchange="this.form.submit();">
+                                        <input class="btn btn-secondary" type="button" value="Importar datos" onclick="document.getElementById('files').click();" />
+                                    </form> 
+                                </div>
+                                <div class="col">
+                                    <button class="btn btn-info" type="button" data-toggle="collapse" 
+                                            data-target="#filter" aria-expanded="false" aria-controls="filter">
+                                        Filtrar datos
+                                    </button>
+                                </div>
+                            </div>
 
-                            <a target="_blank" class="btn btn-info active" th:href="@{/device/export}">Exportar datos</a>
-                            <form th:action="@{/device/import}" method="post" enctype="multipart/form-data">
-                                <input type="file" name="file" onchange="this.form.submit();">
-                            </form>                            
+                            <div class="collapse" id="filter">
+                                <div class="card card-body">
+                                    <form id="filter_form" th:action="@{/device/filter}" method="post" >
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="agencie_name">Dependencia</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="agencie_name" name="agencie_name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="inv_plate">Placa</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="inv_plate" name="inv_plate">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="location">Edificio</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="location" name="location"aria-describedby="locHelp">
+                                                <small id="locHelp" class="form-text text-muted">Puedes ingresar el nombre del edificio o el identificativo</small>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label" for="new_ip">IP Nueva</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="new_ip" name="new_ip"aria-describedby="ipHelp">
+                                                <small id="ipHelp" class="form-text text-muted">Busca una IP en especifico, o parte de una IP</small>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label form-control-label" for="user">Responsable</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-control" name="user" >
+                                                    <option value="0" text=""></option>
+                                                    <option th:each="a: ${users}"                                                            
+                                                            th:value="${a.id}" 
+                                                            th:text="${a.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div> <!-- User Responsible -->
+                                        <div class="form-group row">
+                                            <div class="col-sm-10">
+                                                <button type="submit" class="btn btn-primary">Filtrar equipos</button>
+                                            </div>
+                                        </div>                                        
+                                    </form>
+                                </div>
+                            </div>                            
                             <!-- Lista de eqipos-->
                             <div class="table-responsive">
                                 <table id="ListaEquipos" class="table table-bordered table-hover table-striped">
@@ -158,7 +219,7 @@
                                 <input type="text" th:field="*{RegisterTime}" class="d-none" />
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Tipo de Equipo
-                                    <a class ="btn btn-info active" th:href="@{/tipos}">Agregar+</a>
+                                        <a class ="btn btn-info active" th:href="@{/tipos}">Agregar+</a>
 
                                     </label>
                                     <div class="col-lg-9">
@@ -171,7 +232,7 @@
                                         <select class="form-control" th:field='*{typeDevice}' th:unless="${param.edit != null}">
                                             <option th:each="a:${typeDevices}" th:value="${a.id}" th:text="${a.name}"></option>
                                         </select>
-                                             
+
                                     </div>
                                 </div> <!-- Tipo Equipo -->                                                
                                 <div class="form-group row">
@@ -285,7 +346,7 @@
             </div>
         </div>
         <script>
-            $('.collapse').on('show.bs.collapse', function () {
+            $('.card-body > .collapse').on('show.bs.collapse', function () {
                 $('.collapse').removeClass('show')
                 $(this).addClass('show')
             })

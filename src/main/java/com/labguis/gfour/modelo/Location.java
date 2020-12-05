@@ -12,8 +12,8 @@ public class Location {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
-    @Column(unique = true)
-    private String number_id;
+    @Column(unique = true, name = "number_id")
+    private String numberId;
     private String name;
     
     @ManyToOne
@@ -22,12 +22,12 @@ public class Location {
     public Location() {
     }
 
-    public String getNumber_id() {
-        return number_id;
+    public String getNumberId() {
+        return numberId;
     }
 
-    public void setNumber_id(String number_id) {
-        this.number_id = number_id;
+    public void setNumberId(String numberId) {
+        this.numberId = numberId;
     }
        
     public int getId() {

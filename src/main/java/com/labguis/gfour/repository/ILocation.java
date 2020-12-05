@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ILocation extends CrudRepository<Location, Integer>{
     Location findByName(String name);
+    Location findByNumberId(String value);
 }

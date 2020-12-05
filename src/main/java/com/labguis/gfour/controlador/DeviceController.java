@@ -12,12 +12,8 @@ import com.labguis.gfour.modelo.MigratedDevice;
 import com.labguis.gfour.modelo.TypeDevice;
 import com.labguis.gfour.modelo.User;
 import com.labguis.gfour.modelo.WhiteList;
-import com.labguis.gfour.repository.UserRepository;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -25,11 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,20 +32,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,7 +50,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequestMapping
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class DeviceController {
 
     @Autowired
@@ -101,22 +84,32 @@ public class DeviceController {
     public String importExcel(@RequestParam("file") MultipartFile file, Model model, HttpServletRequest request) throws IOException {
         if (DeviceImporter.hasExcelFormat(file)) {
 
-            List<MigratedDevice> devices = excelData(file.getInputStream());
-            devices.forEach(device -> {
+            List<MigratedDevice> devices = excelData(file.getInputStream(), request);
+            String errores = "";
+            for(MigratedDevice device : devices) {
+                if(device.getStandarKey() == null || 
+                        device.getInvPlate() == null || 
+                        device.getInvPlate().isEmpty() ||
+                        device.getStandarKey().isEmpty()) {
+                    break;
+                }
                 device.setRegisterTime(LocalDateTime.now());
                 device.setUpdateTime(LocalDateTime.now());
                 device.setOwnerUser(ius.findByCookie(request));
                 device.setUpdateUser(ius.findByCookie(request));
                 MigratedDevice check_inv = ids.findByInvPlate(device.getInvPlate());
                 MigratedDevice check_stk = ids.findByStandarKey(device.getStandarKey());
+               
                 if (check_inv != null) {
-                    model.addAttribute("error", "La placa de inventario ya existe");
+                    errores += "La placa de inventario " + device.getInvPlate() + " ya existe<br/>";
                 } else if (check_stk != null) {
-                    model.addAttribute("error", "La clave estandar ya existe");
+                    errores += "La clave estandar " + device.getStandarKey() + " ya existe<br/>";
                 } else {
                     ids.save(device);
                 }
-            });
+            }                
+            if(!errores.isEmpty()) model.addAttribute("error", errores);
+
 
         }        // the models next, its same in /equipos
         model.addAttribute("datos", ids.listar());
@@ -342,7 +335,7 @@ public class DeviceController {
             Location location;
             for (String[] lugare : lugares) {
                 location = new Location();
-                location.setNumber_id(lugare[0]);
+                location.setNumberId(lugare[0]);
                 location.setName(lugare[1]);
                 location.setUser(ius.findByName("Usuario inicial"));
                 ils.save(location);
@@ -386,94 +379,145 @@ public class DeviceController {
         System.out.println("Success Start!");
     }
 
-    public List<MigratedDevice> excelData(InputStream is) {
+    public List<MigratedDevice> excelData(InputStream is, HttpServletRequest request) {
         try {
             Workbook workbook = new XSSFWorkbook(is);
 
-            Sheet sheet = workbook.getSheetAt(0);
-            Iterator<Row> rows = sheet.iterator();
+            List<MigratedDevice> list_devices = new ArrayList<>();
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                
+                String sheetName = workbook.getSheetName(i);
+                
+                Sheet sheet = workbook.getSheetAt(i);
 
-            List<MigratedDevice> list_devices = new ArrayList<MigratedDevice>();
+                Iterator<Row> rows = sheet.iterator();
+                int rowNumber = 0;
+                while (rows.hasNext()) {
+                    Row currentRow = rows.next();
+                    // skip header
+                    if (rowNumber == 0) {
+                        rowNumber++;
+                        continue;
+                    }
+                    Iterator<Cell> cellsInRow = currentRow.iterator();
+                    MigratedDevice device = new MigratedDevice();
 
-            int rowNumber = 0;
-            while (rows.hasNext()) {
-                Row currentRow = rows.next();
-                // skip header
-                if (rowNumber == 0) {
-                    rowNumber++;
-                    continue;
-                }
-                Iterator<Cell> cellsInRow = currentRow.iterator();
-                MigratedDevice device = new MigratedDevice();
+                    int cellIdx = 0;
+                    while (cellsInRow.hasNext()) {
+                        Cell currentCell = cellsInRow.next();
+                        currentCell.setCellType(CellType.STRING);
+                        String value = currentCell.getStringCellValue();
+                        if(value.isEmpty() &&
+                                (cellIdx < 2 || cellIdx == 5 || cellIdx == 11)
+                            ) {// if not get required value
+                            continue;
+                        } 
+                        switch (cellIdx) {
+                            case 0: // A
+                                device.setInvPlate(value);
+                                break;
 
-                int cellIdx = 0;
-                while (cellsInRow.hasNext()) {
-                    Cell currentCell = cellsInRow.next();
-                    currentCell.setCellType(CellType.STRING);
-                    String value = currentCell.getStringCellValue();
-                    switch (cellIdx) {
-                        case 0:
-                            device.setInvPlate(value);
-                            break;
+                            case 1: // B
+                                TypeDevice tipo =itds.findByName(value);
+                                if(tipo == null) {
+                                    tipo = new TypeDevice();
+                                    tipo.setName(value);
+                                    tipo.setUser(ius.findByCookie(request));
+                                    itds.save(tipo);
+                                }
+                                device.setTypeDevice(itds.findByName(value));
+                                break;
 
-                        case 1:
-                            device.setTypeDevice(itds.findByName(value));
-                            break;
+                            case 2: // C
+                                Agencie dependencia = ias.findByName(value);
+                                if(dependencia == null) { // No existe, crear
+                                    dependencia = new Agencie();
+                                    dependencia.setName(value);
+                                    ias.save(dependencia);
+                                }
+                                device.setAgencie(ias.findByName(value));
+                                break;
 
-                        case 2:
-                            device.setAgencie(ias.findByName(value));
-                            break;
+                            case 3: // D
+                                Location edificio = ils.findByNumberID(value);
+                                if(edificio == null) {
+                                    edificio = new Location();
+                                    edificio.setNumberId(value);
+                                    edificio.setName("Edificio "+value);
+                                    edificio.setUser(ius.findByCookie(request));
+                                    ils.save(edificio);
+                                }
+                                device.setLocation(ils.findByNumberID(value));
+                                break;
 
-                        case 3:
-                            device.setLocation(ils.findByName(value));
-                            break;
+                            case 4: // E
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setNewIP(value);
+                                break;
 
-                        case 4:
-                            device.setNewIP(value);
-                            break;
+                            case 5: // F (Responsable)
+                                User responsable = ius.findByName(value);                                
+                                if(responsable == null) {
+                                    responsable = new User();
+                                    responsable.setName(value);
+                                    responsable.setEmail(value + "@temporalmail.com");
+                                    responsable.setPassword(ius.hashPassword("password"));
+                                    ius.save(responsable);
+                                }
+                                device.setUser(ius.findByName(value));
+                                break;
 
-                        case 5: // user responsable
-                            device.setUser(ius.findByName(value));
-                            break;
+                            case 6: // G
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setClassRoom(Integer.parseInt(value));
+                                break;
 
-                        case 6:
-                            device.setClassRoom(Integer.parseInt(value));
-                            break;
+                            case 7: // H
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setOldIP(value);
+                                break;
 
-                        case 7:
-                            device.setDescription(value);
-                            break;
+                            case 8: // I
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setSwitchIP(value);
+                                break;
 
-                        case 8:
-                            device.setOldIP(value);
-                            break;
+                            case 9: // J
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setPort(value);
+                                break;
 
-                        case 9:
-                            device.setSwitchIP(value);
-                            break;
+                            case 10: // K
+                                if(value.isEmpty()) {
+                                    value = "0";
+                                }
+                                device.setMAC(value);
+                                break;
 
-                        case 10:
-                            device.setPort(value);
-                            break;
+                            case 11: // L
+                                device.setStandarKey(value);
+                                break;
 
-                        case 11:
-                            device.setMAC(value);
-                            break;
+                            default:
+                                break;
+                        }
 
-                        case 12:
-                            device.setStandarKey(value);
-                            break;
-
-                        default:
-                            break;
+                        cellIdx++;
                     }
 
-                    cellIdx++;
+                    list_devices.add(device);
                 }
-
-                list_devices.add(device);
             }
-
             workbook.close();
 
             return list_devices;

@@ -33,6 +33,16 @@ public class LocationService implements ILocationService {
     public List<Location> listar() {
         return (List<Location>)data.findAll();
     }
+
+    @Override
+    public Location findByID(String value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Location findByNumberID(String value) {
+        return data.findByNumberId(value);
+    }
     
     
 }

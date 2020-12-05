@@ -98,6 +98,7 @@ public class UsuarioService implements IUsuarioService {
                 }
             }
             Optional<User> user = data.findById(id);
+            if(!user.isPresent()) return false;
             if (user.get() != null) { // the user exist
                 if (this.hashPassword(user.get().getEmail()).equals(mail)) { // if all cookies are ok
                     return true;

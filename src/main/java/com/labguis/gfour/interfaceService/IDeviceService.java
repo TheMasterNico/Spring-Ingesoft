@@ -12,4 +12,5 @@ public interface IDeviceService {
     public void delete(int id);
     MigratedDevice findByInvPlate(String inv_plate);
     MigratedDevice findByStandarKey(String standarKey);
+    List<MigratedDevice>filter(String sql);
 }

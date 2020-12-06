@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import sun.management.snmp.util.MibLogger;
 
 /**
  *
@@ -81,22 +82,79 @@ public class DeviceController {
         return "equipos";
     }
 
-    @PostMapping("/device/filter")
+    @PostMapping("/filter")
     public String filterData(Model model, HttpServletRequest request,
-            @RequestParam(required = false) String agencie_name, 
-            @RequestParam(required = false) String inv_plate, 
-            @RequestParam(required = false) String location, 
-            @RequestParam(required = false) String new_ip, 
-            @RequestParam(required = false) String user
-        ) {
-        
+            @RequestParam(required = false) String agencie_name,
+            @RequestParam(required = false) String inv_plate,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String new_ip,
+            @RequestParam(required = false) String user,
+            @RequestParam(required = false) String type
+    ) {
+
         if (!ius.isUserLogged(request)) { // if not logged
             return "redirect:/login";
         }
-        if(!agencie_name.isEmpty()) {
-            System.err.println(agencie_name);
+        List<MigratedDevice> equipos = ids.listar();
+        List<MigratedDevice> result = new ArrayList<MigratedDevice>();
+
+        for (MigratedDevice equipo : equipos) {
+            boolean add = false;
+            if (!agencie_name.isEmpty()) {
+                if (equipo.getAgencie().getName().toLowerCase().contains(agencie_name.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (!inv_plate.isEmpty()) {
+                if (equipo.getInvPlate().toLowerCase().contains(inv_plate.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (!location.isEmpty()) {
+                if (equipo.getLocation().getName().toLowerCase().contains(location.toLowerCase()) ||
+                    equipo.getLocation().getNumberId().toLowerCase().contains(location.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (!new_ip.isEmpty()) {
+                if (equipo.getNewIP().toLowerCase().contains(new_ip.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (!user.isEmpty()) {
+                if (equipo.getUser().getName().toLowerCase().contains(user.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if (!type.isEmpty()) {
+                if (equipo.getTypeDevice().getName().toLowerCase().contains(type.toLowerCase())) {
+                    add = true;
+                }
+                else {
+                    continue;
+                }
+            }
+            if(add) { // cumple
+                result.add(equipo);
+            }
         }
-        model.addAttribute("datos", ids.listar());
+
+        model.addAttribute("datos", result.isEmpty() ? ids.listar() : result);
         model.addAttribute("isadmin", ius.isUserAdmin(request));
         model.addAttribute("device", new MigratedDevice());
         model.addAttribute("agencies", ias.listar());

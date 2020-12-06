@@ -62,4 +62,9 @@ public class DeviceService implements IDeviceService {
         return data.findByStandarKey(standarKey);
     }
 
+    @Override
+    public List<MigratedDevice> filter(String sql) {
+        return data.filter(sql);
+    }
+    
 }
